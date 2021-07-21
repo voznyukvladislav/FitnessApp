@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/training_list">
+
+    <fragment
+        android:id="@+id/training_list"
+        android:name="com.example.fitnessapp.TrainingList"
+        android:label="fragment_training_list"
+        tools:layout="@layout/fragment_training_list" >
+        <action
+            android:id="@+id/action_training_list_to_workoutTasksList"
+            app:destination="@id/workoutTasksList"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fitness"
+        android:name="com.example.fitnessapp.Fitness"
+        android:label="fragment_fitness"
+        tools:layout="@layout/fragment_fitness" />
+    <fragment
+        android:id="@+id/calendar"
+        android:name="com.example.fitnessapp.Calendar"
+        android:label="fragment_calendar"
+        tools:layout="@layout/fragment_calendar" />
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.example.fitnessapp.Settings"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/workout_tasks"
+        android:name="com.example.fitnessapp.WorkoutTasks"
+        android:label="fragment_workout_tasks"
+        tools:layout="@layout/fragment_workout_tasks" >
+        <argument
+            android:name="workoutId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/workoutTasksList"
+        android:name="com.example.fitnessapp.WorkoutTasksList"
+        android:label="fragment_workout_tasks_list"
+        tools:layout="@layout/fragment_workout_tasks_list" >
+        <action
+            android:id="@+id/action_workoutTasksList_to_workoutSetsList"
+            app:destination="@id/workoutSetsList"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_workoutTasksList_to_training_list"
+            app:destination="@id/training_list"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/training_list"/>
+    </fragment>
+    <fragment
+        android:id="@+id/workoutSetsList"
+        android:name="com.example.fitnessapp.WorkoutSetsList"
+        android:label="fragment_workout_sets_list"
+        tools:layout="@layout/fragment_workout_sets_list" >
+        <action
+            android:id="@+id/action_workoutSetsList_to_training_list"
+            app:destination="@id/training_list"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/training_list" />
+        <action
+            android:id="@+id/action_workoutSetsList_to_workoutTasksList"
+            app:destination="@id/workoutTasksList"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/workoutTasksList"
+            />
+    </fragment>
+</navigation>
