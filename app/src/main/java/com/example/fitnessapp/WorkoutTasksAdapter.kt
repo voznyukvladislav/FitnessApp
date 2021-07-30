@@ -2,17 +2,11 @@ package com.example.fitnessapp
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 
 class WorkoutTasksAdapter(var values: ArrayList<WorkoutTaskItem>,
                          var context: Context?,
@@ -70,7 +64,7 @@ class WorkoutTasksAdapter(var values: ArrayList<WorkoutTaskItem>,
         var workoutTaskRepetitions: TextView? = null
         var workoutTaskRest: TextView? = null
         init {
-            workoutTaskName = itemView.findViewById(R.id.workoutTaskName)
+            workoutTaskName = itemView.findViewById(R.id.doneWorkoutName)
             workoutTaskSets = itemView.findViewById(R.id.workoutTaskSets)
             workoutTaskRepetitions = itemView.findViewById(R.id.workoutTaskRepetitions)
             workoutTaskRest = itemView.findViewById(R.id.workoutTaskRest)

@@ -28,7 +28,6 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
     override fun onBindViewHolder(holder: workoutSetsListViewHolder, position: Int) {
         val item = values[position]
 
-        holder.workoutSetsNumber?.setText("Set number: ${item.workoutSetNum}")
         holder.workoutSetRepetitions?.setText("Repetitions: ${item.workoutSetRepetitions}")
         holder.workoutSetRest?.setText("Rest: ${item.workoutSetRest}")
     }
@@ -49,18 +48,16 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("DELETE FROM workoutSets WHERE workoutSetId = ${values[position].workoutSetId}")
+        db.execSQL("UPDATE workoutSets SET isDeleted = 1 WHERE workoutSetId = ${values[position].workoutSetId}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }
 
     class workoutSetsListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        var workoutSetsNumber: TextView? = null
         var workoutSetRepetitions: TextView? = null
         var workoutSetRest: TextView? = null
 
         init {
-            workoutSetsNumber = itemView.findViewById(R.id.setNumber)
             workoutSetRepetitions = itemView.findViewById(R.id.repetitionsNumber)
             workoutSetRest = itemView.findViewById(R.id.restNumber)
         }
@@ -69,10 +66,6 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
 
 class WorkoutSetsListItem {
     var workoutSetId: Int = 0
-        get() = field
-        set(value) { field = value }
-
-    var workoutSetNum: Int = 0
         get() = field
         set(value) { field = value }
 

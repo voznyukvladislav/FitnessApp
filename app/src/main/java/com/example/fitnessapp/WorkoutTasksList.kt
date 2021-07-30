@@ -38,11 +38,6 @@ class WorkoutTasksList : Fragment() {
         val root = inflater.inflate(R.layout.fragment_workout_tasks_list, container, false)
 
         val db = root.context.openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
-        db.execSQL("CREATE TABLE IF NOT EXISTS workoutTasks (workoutTaskId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "workoutId INTEGER," +
-                "workoutTaskName TEXT," +
-                "workoutTaskOrderNum INTEGER)")
-
 
         // Workout tasks list setup start
         val workoutTasksList: RecyclerView = root.findViewById(R.id.workoutTasksList)
@@ -69,7 +64,7 @@ class WorkoutTasksList : Fragment() {
 
         // Navigation bar
         // Getting related workout name
-        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId}", null)
+        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId} AND isDeleted = 0", null)
         var workoutName = ""
         while(workoutsCursor.moveToNext()) {
             workoutName = workoutsCursor.getString(0)
@@ -148,7 +143,7 @@ class WorkoutTasksList : Fragment() {
     private fun getWorkoutTasksList(db: SQLiteDatabase, workoutId: Int): ArrayList<WorkoutTasksListItem> {
         val dataSet: ArrayList<WorkoutTasksListItem> = arrayListOf()
 
-        val workoutTasksCursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM workoutTasks WHERE workoutId = ${workoutId} ORDER BY workoutTaskOrderNum", null)
+        val workoutTasksCursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM workoutTasks WHERE workoutId = ${workoutId} AND isDeleted = 0 ORDER BY workoutTaskOrderNum", null)
 
         var workoutTaskId = 0
         var workoutTaskName = ""
@@ -161,12 +156,12 @@ class WorkoutTasksList : Fragment() {
             workoutTaskId = workoutTasksCursor.getInt(0)
             workoutTaskName = workoutTasksCursor.getString(1)
 
-            workoutSetsCursor = db.rawQuery("SELECT COUNT(workoutSetId) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId}", null)
+            workoutSetsCursor = db.rawQuery("SELECT COUNT(workoutSetId) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
             while(workoutSetsCursor.moveToNext()) {
                 workoutSetsQuantity = workoutSetsCursor.getInt(0)
             }
 
-            workoutSetsCursor = db.rawQuery("SELECT SUM(workoutSetRepetitions) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId}", null)
+            workoutSetsCursor = db.rawQuery("SELECT SUM(workoutSetRepetitions) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
             while(workoutSetsCursor.moveToNext()) {
                 workoutTaskRepetitionsQuantity = workoutSetsCursor.getInt(0)
             }
@@ -179,7 +174,7 @@ class WorkoutTasksList : Fragment() {
 
     // Inserts new row in db and returns its primary key
     private fun insertWorkoutTask(db: SQLiteDatabase, workoutTaskName: String, workoutId: Int): Int {
-        db.execSQL("INSERT INTO workoutTasks VALUES (NULL, ${workoutId}, '${workoutTaskName}', 0)")
+        db.execSQL("INSERT INTO workoutTasks VALUES (NULL, ${workoutId}, '${workoutTaskName}', 0, 0)")
         var workoutTaskId = 0
         val cursor = db.rawQuery("SELECT MAX(workoutTaskId) FROM workoutTasks", null)
         while(cursor.moveToNext()) {

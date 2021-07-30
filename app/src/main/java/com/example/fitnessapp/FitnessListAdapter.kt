@@ -1,5 +1,6 @@
 package com.example.fitnessapp
 
+import android.content.Context
 import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
@@ -8,14 +9,17 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 val TYPE_HEADER = 1
 val TYPE_ITEM = 2
 val TYPE_SAVE_BUTTON = 3
 
-class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>, val workoutId: Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return values.size
@@ -83,7 +87,20 @@ class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>)
                 recyclerView.visibility = View.GONE
                 recyclerView.startAnimation(animationHide)
 
-                //TODO("Save done workouts inside database")
+                val db = root.context.openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
+
+                val dateFormatYear = SimpleDateFormat("yyyy")
+                val year = dateFormatYear.format(Calendar.getInstance().time)
+
+                val dateFormatMonth = SimpleDateFormat("M")
+                val month = dateFormatMonth.format(Calendar.getInstance().time)
+
+                val dateFormatDay = SimpleDateFormat("d")
+                val day = dateFormatDay.format(Calendar.getInstance().time)
+
+                db.execSQL("INSERT INTO workoutDates VALUES (NULL, ${workoutId}, ${day}, ${month}, ${year})")
+
+                Toast.makeText(root.context, "day = ${day} month = ${month} year = ${year}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -137,19 +154,16 @@ class FitnessListHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(item
 }
 
 class FitnessListItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-    var setNum: TextView? = null
     var repetitionsNum: TextView? = null
     var restNum: TextView? = null
     var doneTaskButton: Button? = null
     init {
-        setNum = itemView.findViewById(R.id.setNum)
         repetitionsNum = itemView.findViewById(R.id.repetitionsNum)
         restNum = itemView.findViewById(R.id.restNum)
         doneTaskButton = itemView.findViewById(R.id.doneTaskButton)
     }
 
     fun setItemInformation(item: FitnessListItem, setNum: Int) {
-        this.setNum!!.text = "Set num: ${setNum.toString()}"
         this.repetitionsNum!!.text = "Repetitions: ${item.workoutRepetitions.toString()}"
         this.restNum!!.text = "Rest: ${item.workoutRest.toString()}"
     }
@@ -164,10 +178,6 @@ class FitnessListDoneButtonViewHolder(itemView: View): RecyclerView.ViewHolder(i
 
 class FitnessListItem {
     var workoutTaskName: String = ""
-        get() = field
-        private set(value) { field = value }
-
-    var workoutSetNum: Int = 0
         get() = field
         private set(value) { field = value }
 
@@ -190,8 +200,7 @@ class FitnessListItem {
     }
 
     // If inputting few parameters in list type will be TYPE_ITEM
-    constructor(workoutSetNum: Int, workoutRepetitions: Int, workoutRest: Int) {
-        this.workoutSetNum = workoutSetNum
+    constructor(workoutRepetitions: Int, workoutRest: Int) {
         this.workoutRepetitions = workoutRepetitions
         this.workoutRest = workoutRest
         this.inListType = TYPE_ITEM

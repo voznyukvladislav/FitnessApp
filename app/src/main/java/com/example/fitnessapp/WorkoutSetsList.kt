@@ -37,11 +37,6 @@ class WorkoutSetsList : Fragment() {
         var root = inflater.inflate(R.layout.fragment_workout_sets_list, container, false)
 
         var db: SQLiteDatabase = this.requireContext().openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
-        db.execSQL("CREATE TABLE IF NOT EXISTS workoutSets (workoutSetId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "workoutTaskId INTEGER," +
-                "workoutSetRepetitions INTEGER," +
-                "workoutSetRest INTEGER," +
-                "workoutSetOrderNum INTEGER)")
 
         val workoutId = arguments?.getInt("workoutId")
         val workoutTaskId = arguments?.getInt("workoutTaskId")
@@ -68,14 +63,14 @@ class WorkoutSetsList : Fragment() {
         // End setup recycler view
 
         // Navigation bar start
-        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId}", null)
+        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId} AND isDeleted = 0", null)
         var workoutName = ""
         while(workoutsCursor.moveToNext()) {
             workoutName = workoutsCursor.getString(0)
         }
         workoutsCursor.close()
 
-        val workoutTasksCursor = db.rawQuery("SELECT workoutTaskName FROM workoutTasks WHERE workoutTaskId = ${workoutTaskId}", null)
+        val workoutTasksCursor = db.rawQuery("SELECT workoutTaskName FROM workoutTasks WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
         var workoutTaskName = ""
         while(workoutTasksCursor.moveToNext()) {
             workoutTaskName = workoutTasksCursor.getString(0)
@@ -173,7 +168,7 @@ class WorkoutSetsList : Fragment() {
         var dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
 
         val cursor = db.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum " +
-                "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} ORDER BY workoutSetOrderNum", null)
+                "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0 ORDER BY workoutSetOrderNum", null)
 
         var workoutSetId: Int = 0
         var workoutSetRepetitions: Int = 0
@@ -198,6 +193,7 @@ class WorkoutSetsList : Fragment() {
                 "${workoutTaskId}, " +
                 "${workoutSetRepetitions}, " +
                 "${workoutSetRest}, " +
+                "0," +
                 "0)")
 
         var insertedId = 0

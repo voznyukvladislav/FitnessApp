@@ -29,7 +29,6 @@ class Fitness : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_fitness, container, false)
         db = root.context.openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
-        db.execSQL("CREATE TABLE IF NOT EXISTS Workouts (workoutId INTEGER PRIMARY KEY AUTOINCREMENT, workoutName TEXT, workoutOrderNum INT)")
 
         val workoutsList = getWorkouts(db)
         val workoutNames = getNamesAndNumbers(workoutsList)
@@ -64,7 +63,7 @@ class Fitness : Fragment() {
                     val manager = LinearLayoutManager(this.requireContext())
                     fitnessListRecyclerView.layoutManager = manager
 
-                    val adapter = FitnessListAdapter(root, fitnessList)
+                    val adapter = FitnessListAdapter(root, fitnessList, workoutsList[selectedItemNum].getId())
                     fitnessListRecyclerView.adapter = adapter
 
                     val animationShow = AnimationUtils.loadAnimation(root.context, R.anim.popup_show)
@@ -92,7 +91,7 @@ class Fitness : Fragment() {
 
                             val fitnessList = getFitnessList(db, workoutsList, selectedItemNum)
 
-                            val adapter = FitnessListAdapter(root, fitnessList)
+                            val adapter = FitnessListAdapter(root, fitnessList, workoutsList[selectedItemNum].getId())
                             fitnessListRecyclerView.adapter = adapter
 
                             fitnessListRecyclerView.visibility = View.VISIBLE
@@ -118,7 +117,7 @@ class Fitness : Fragment() {
 
             var workoutSets = getWorkoutSets(db, workoutTasks[i].workoutTasksListItemId)
             for(j in 0 until workoutSets.size) {
-                fitnessList.add(FitnessListItem(workoutSets[j].workoutSetNum, workoutSets[j].workoutSetRepetitions, workoutSets[j].workoutSetRest))
+                fitnessList.add(FitnessListItem(workoutSets[j].workoutSetRepetitions, workoutSets[j].workoutSetRest))
             }
         }
         fitnessList.add(FitnessListItem())
@@ -126,7 +125,7 @@ class Fitness : Fragment() {
     }
 
     fun getWorkouts(db: SQLiteDatabase): ArrayList<WorkoutListItem> { // Returns array with information about workouts from db
-        val cursor = db.rawQuery("SELECT workoutId, workoutName FROM Workouts ORDER BY workoutOrderNum", null)
+        val cursor = db.rawQuery("SELECT workoutId, workoutName FROM Workouts WHERE isDeleted = 0 ORDER BY workoutOrderNum", null)
         val workoutsArray = arrayListOf<WorkoutListItem>()
 
         while(cursor.moveToNext()) {
@@ -138,7 +137,7 @@ class Fitness : Fragment() {
 
     fun getWorkoutTasks(db: SQLiteDatabase, workoutId: Int): ArrayList<WorkoutTasksListItem> {
         val workoutTasks = arrayListOf<WorkoutTasksListItem>()
-        val cursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM WorkoutTasks WHERE workoutId = ${workoutId} ORDER BY workoutTaskOrderNum", null)
+        val cursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM WorkoutTasks WHERE workoutId = ${workoutId} AND isDeleted = 0 ORDER BY workoutTaskOrderNum", null)
 
         var workoutTaskId = 0
         var workoutTaskName = ""
@@ -156,7 +155,7 @@ class Fitness : Fragment() {
 
     fun getWorkoutSets(db: SQLiteDatabase, workoutTaskId: Int): ArrayList<WorkoutSetsListItem> {
         var dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
-        var cursor = db.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum FROM workoutSets WHERE workoutTaskId = ${workoutTaskId}", null)
+        var cursor = db.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
 
         var workoutSetId = 0
         var workoutSetRepetitions = 0

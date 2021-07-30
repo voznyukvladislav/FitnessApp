@@ -49,18 +49,7 @@ class TrainingList : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_training_list, container, false)
         db = root.context.openOrCreateDatabase("workout.db", MODE_PRIVATE, null)
-        db.execSQL("CREATE TABLE IF NOT EXISTS Workouts (workoutId INTEGER PRIMARY KEY AUTOINCREMENT, workoutName TEXT, workoutOrderNum INT)")
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS workoutTasks (workoutTaskId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "workoutId INTEGER," +
-                "workoutTaskName TEXT," +
-                "workoutTaskOrderNum INTEGER)")
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS workoutSets (workoutSetId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "workoutTaskId INTEGER," +
-                "workoutSetRepetitions INTEGER," +
-                "workoutSetRest INTEGER," +
-                "workoutSetOrderNum INTEGER)")
+        createDatabaseTables(db)
 
         dataSet = fillList(db)
 
@@ -144,7 +133,7 @@ class TrainingList : Fragment() {
             if(newWorkoutName.text.toString() != "") {
                 isOpenedAddWindow = false
 
-                db.execSQL("INSERT INTO Workouts VALUES(NULL, '${newWorkoutName.text.toString()}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts))")
+                db.execSQL("INSERT INTO Workouts VALUES(NULL, '${newWorkoutName.text.toString()}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts), 0)")
 
                 val cursor = db.rawQuery("SELECT MAX(workoutId) FROM Workouts", null)
                 var workoutId: Int = 0
@@ -169,6 +158,34 @@ class TrainingList : Fragment() {
         return root
     }
 
+    private fun createDatabaseTables(db: SQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS Workouts " +
+                "(workoutId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "workoutName TEXT," +
+                "workoutOrderNum INTEGER," +
+                "isDeleted INTEGER)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS workoutTasks " +
+                "(workoutTaskId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "workoutId INTEGER," +
+                "workoutTaskName TEXT," +
+                "workoutTaskOrderNum INTEGER," +
+                "isDeleted INTEGER)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS workoutSets " +
+                "(workoutSetId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "workoutTaskId INTEGER," +
+                "workoutSetRepetitions INTEGER," +
+                "workoutSetRest INTEGER," +
+                "workoutSetOrderNum INTEGER," +
+                "isDeleted INTEGER)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS workoutDates (workoutDateId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "workoutId INT," +
+                "workoutDateDay TEXT," +
+                "workoutDateMonth TEXT," +
+                "workoutDateYear TEXT)")
+    }
     private fun hideKeyboard() {
         val view: View? = this.view
         if(view != null) {
@@ -178,7 +195,7 @@ class TrainingList : Fragment() {
     }
     private fun fillList(db: SQLiteDatabase): ArrayList<WorkoutListItem> {
         val dataSet: ArrayList<WorkoutListItem> = arrayListOf()
-        val query = db.rawQuery("SELECT * FROM Workouts ORDER BY workoutOrderNum", null)
+        val query = db.rawQuery("SELECT * FROM Workouts WHERE isDeleted = 0 ORDER BY workoutOrderNum", null)
 
         while(query.moveToNext()) {
             // Creates new WorkoutListItem object with id and name

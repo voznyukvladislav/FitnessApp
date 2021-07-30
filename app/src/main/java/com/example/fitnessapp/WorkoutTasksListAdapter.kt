@@ -1,8 +1,6 @@
 package com.example.fitnessapp
 
-import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.media.MediaRouter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -58,7 +56,7 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("DELETE FROM workoutTasks WHERE workoutTaskId = ${values[position].workoutTasksListItemId}")
+        db.execSQL("UPDATE workoutTasks SET isDeleted = 1 WHERE workoutTaskId = ${values[position].workoutTasksListItemId}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }
@@ -68,7 +66,7 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
         var workoutTasksListItemTotalSets: TextView? = null
         var workoutTasksListItemTotalRepetitions: TextView? = null
         init {
-            workoutTasksListItemName = itemView.findViewById(R.id.workoutTaskName)
+            workoutTasksListItemName = itemView.findViewById(R.id.doneWorkoutName)
             workoutTasksListItemTotalSets = itemView.findViewById(R.id.workoutTotalSets)
             workoutTasksListItemTotalRepetitions = itemView.findViewById(R.id.workoutTotalRepetitions)
         }

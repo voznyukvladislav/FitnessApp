@@ -12,6 +12,8 @@
     <color name="orange"> #FFA500 </color>
     <color name="yellow">#FFEB3B</color>
 
+    <color name="dark_red">#980101</color>
+
     <!--<color name="yellow"> #FFFF00 </color>-->
 
     <color name="blue">#2DBABA</color>

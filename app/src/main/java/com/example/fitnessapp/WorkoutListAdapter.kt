@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 
@@ -52,7 +51,7 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("DELETE FROM Workouts WHERE workoutId = ${values.get(position).getId()}")
+        db.execSQL("UPDATE Workouts SET isDeleted = 1 WHERE workoutId = ${values.get(position).getId()}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }
@@ -60,7 +59,7 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
     class WorkoutListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         var workoutName: TextView? = null
         init {
-            workoutName = itemView.findViewById(R.id.workoutTaskName)
+            workoutName = itemView.findViewById(R.id.doneWorkoutName)
         }
     }
 }
