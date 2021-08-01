@@ -17,7 +17,7 @@ class WorkoutListItem {
         return this.id
     }
     /*fun getId(db: SQLiteDatabase): Int {
-        var cursor: Cursor = db.rawQuery("SELECT workoutId FROM Workouts WHERE name = '${this.getName()}'", null)
+        var cursor: Cursor = db.rawQuery("SELECT workoutId FROM workouts WHERE name = '${this.getName()}'", null)
         if(cursor.moveToFirst()) {
             return cursor.getString(0).toInt()
         }

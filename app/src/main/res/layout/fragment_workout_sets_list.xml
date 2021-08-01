@@ -79,7 +79,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/workoutSetsPopupWindow"
             android:layout_width="310dp"
-            android:layout_height="250dp"
+            android:layout_height="280dp"
             android:background="@drawable/rounded_window_yellow"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -100,7 +100,7 @@
                 app:layout_constraintHorizontal_bias="0.509"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.133" />
+                app:layout_constraintVertical_bias="0.12" />
 
             <EditText
                 android:id="@+id/newSetRestNum"
@@ -115,7 +115,22 @@
                 app:layout_constraintHorizontal_bias="0.509"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.502" />
+                app:layout_constraintVertical_bias="0.364" />
+
+            <EditText
+                android:id="@+id/newSetWeight"
+                android:layout_width="259dp"
+                android:layout_height="55dp"
+                android:ems="10"
+                android:hint="Weight"
+                android:inputType="number"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.608" />
 
             <Button
                 android:id="@+id/workoutSetPopupWindowCancelButton"

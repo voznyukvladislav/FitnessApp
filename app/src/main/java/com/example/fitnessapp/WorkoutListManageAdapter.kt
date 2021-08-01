@@ -21,7 +21,7 @@ class WorkoutListManageAdapter(adapter: WorkoutListAdapter, context: Context, dr
 
     private suspend fun UpdateOrderNums(values: ArrayList<WorkoutListItem>) {
         for(i in 0 until values.size) {
-            db.execSQL("UPDATE Workouts SET workoutOrderNum = ${i + 1} WHERE workoutId = ${values.get(i).getId()}")
+            db.execSQL("UPDATE workouts SET workoutOrderNum = ${i + 1} WHERE workoutId = ${values.get(i).getId()}")
         }
     }
 

@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class TrainingList : Fragment() {
+class WorkoutsList : Fragment() {
 
     private lateinit var db: SQLiteDatabase
 
@@ -51,7 +51,8 @@ class TrainingList : Fragment() {
         db = root.context.openOrCreateDatabase("workout.db", MODE_PRIVATE, null)
         createDatabaseTables(db)
 
-        dataSet = fillList(db)
+        val listGetter = ListGetter(db)
+        dataSet = listGetter.getWorkoutsList()
 
         navController = (activity as MainActivity?)!!.findNavController(R.id.screen)
 
@@ -130,10 +131,10 @@ class TrainingList : Fragment() {
 
         // Adding new workout to database
         addWorkout.setOnClickListener {
-            if(newWorkoutName.text.toString() != "") {
+            if(!newWorkoutName.text.toString().isNullOrBlank()) {
                 isOpenedAddWindow = false
 
-                db.execSQL("INSERT INTO Workouts VALUES(NULL, '${newWorkoutName.text.toString()}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts), 0)")
+                db.execSQL("INSERT INTO workouts VALUES(NULL, '${newWorkoutName.text.toString()}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts), 0)")
 
                 val cursor = db.rawQuery("SELECT MAX(workoutId) FROM Workouts", null)
                 var workoutId: Int = 0
@@ -159,7 +160,9 @@ class TrainingList : Fragment() {
     }
 
     private fun createDatabaseTables(db: SQLiteDatabase) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS Workouts " +
+
+        // Workout tables
+        db.execSQL("CREATE TABLE IF NOT EXISTS workouts " +
                 "(workoutId INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "workoutName TEXT," +
                 "workoutOrderNum INTEGER," +
@@ -178,30 +181,45 @@ class TrainingList : Fragment() {
                 "workoutSetRepetitions INTEGER," +
                 "workoutSetRest INTEGER," +
                 "workoutSetOrderNum INTEGER," +
+                "workoutSetWeight," +
                 "isDeleted INTEGER)")
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS workoutDates (workoutDateId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "workoutId INT," +
-                "workoutDateDay TEXT," +
-                "workoutDateMonth TEXT," +
-                "workoutDateYear TEXT)")
+        // Done workout tables
+        db.execSQL("CREATE TABLE IF NOT EXISTS doneWorkouts " +
+                "(doneWorkoutId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "doneWorkoutName TEXT)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS doneWorkoutTasks " +
+                "(doneWorkoutTaskId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "doneWorkoutId INTEGER, " +
+                "doneWorkoutTaskName TEXT)")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS doneWorkoutSets " +
+                "(doneWorkoutSetId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "doneWorkoutTaskId INTEGER, " +
+                "doneWorkoutSetRepetitions INTEGER, " +
+                "doneWorkoutSetRest INTEGER, " +
+                "doneWorkoutSetWeight INTEGER)")
+
+        // Calendar table
+        db.execSQL("CREATE TABLE IF NOT EXISTS calendarDates " +
+                "(calendarDateId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "calendarDateDay TEXT," +
+                "calendarDateMonth TEXT," +
+                "calendarDateYear TEXT)")
+
+        // Table which connects done workout to some calendar date
+        db.execSQL("CREATE TABLE IF NOT EXISTS doneWorkoutsCalendar " +
+                "(doneWorkoutRecordId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "doneWorkoutId INTEGER," +
+                "workoutDateId INTEGER)")
     }
+
     private fun hideKeyboard() {
         val view: View? = this.view
         if(view != null) {
             val imm: InputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS)
         }
-    }
-    private fun fillList(db: SQLiteDatabase): ArrayList<WorkoutListItem> {
-        val dataSet: ArrayList<WorkoutListItem> = arrayListOf()
-        val query = db.rawQuery("SELECT * FROM Workouts WHERE isDeleted = 0 ORDER BY workoutOrderNum", null)
-
-        while(query.moveToNext()) {
-            // Creates new WorkoutListItem object with id and name
-            dataSet.add(WorkoutListItem(query.getString(0).toString().toInt(), query.getString(1).toString()))
-        }
-        query.close()
-        return dataSet
     }
 }

@@ -43,15 +43,13 @@ class Calendar : Fragment() {
 
 
         val doneWorkoutsListRecyclerView: RecyclerView = root.findViewById(R.id.doneWorkoutsList)
-        val dataSet = getDoneWorkoutsList(db)
+        val dataSet = getDoneWorkoutsListRecyclerView(db, workoutDatesList)
 
         val manager = LinearLayoutManager(this.requireContext())
         doneWorkoutsListRecyclerView.layoutManager = manager
 
         val adapter = DoneWorkoutsListAdapter(dataSet)
         doneWorkoutsListRecyclerView.adapter = adapter
-
-
 
         return root
     }
@@ -74,39 +72,37 @@ class CurrentDayDecorator(context: Activity?, currentDay: CalendarDay) : DayView
     }
 }
 
+fun getDoneWorkoutsListRecyclerView(db: SQLiteDatabase, dates: ArrayList<WorkoutDatesListItem>): ArrayList<DoneWorkoutsRecyclerViewItem> {
+    val dataSet: ArrayList<DoneWorkoutsRecyclerViewItem> = arrayListOf()
+
+    val listGetter = ListGetter(db)
+    for(i in 0 until dates.size) {
+        dataSet.add(DoneWorkoutsRecyclerViewItem(dates[i].day, dates[i].month, dates[i].year))
+        val relatedDoneWorkouts = listGetter.getDoneWorkoutsFromDate(dates[i].dateId)
+
+        for(j in 0 until relatedDoneWorkouts.size) {
+            dataSet.add(DoneWorkoutsRecyclerViewItem(relatedDoneWorkouts[j].doneWorkoutId, relatedDoneWorkouts[j].doneWorkoutName))
+        }
+    }
+    return dataSet
+}
+
 fun getDates(db: SQLiteDatabase): ArrayList<WorkoutDatesListItem> {
     val datesList: ArrayList<WorkoutDatesListItem> = arrayListOf()
-    val cursor = db.rawQuery("SELECT * FROM workoutDates", null)
+    val cursor = db.rawQuery("SELECT * FROM calendarDates", null)
 
+    var dateId = 0
     var day = ""
     var month = ""
     var year = ""
     while(cursor.moveToNext()) {
-        day = cursor.getString(2)
-        month = cursor.getString(3)
-        year = cursor.getString(4)
+        dateId = cursor.getInt(0)
+        day = cursor.getString(1)
+        month = cursor.getString(2)
+        year = cursor.getString(3)
 
-        datesList.add(WorkoutDatesListItem(day, month, year))
+        datesList.add(WorkoutDatesListItem(dateId, day, month, year))
     }
+    cursor.close()
     return datesList
-}
-
-class WorkoutDatesListItem {
-    var day: String = ""
-    var month: String = ""
-    var year: String = ""
-
-    constructor(day: String, month: String, year: String) {
-        this.day = day
-        this.month = month
-        this.year = year
-    }
-}
-
-fun getDoneWorkoutsList(db: SQLiteDatabase): ArrayList<DoneWorkoutsListItem> {
-    val dataSet = arrayListOf<DoneWorkoutsListItem>()
-
-    val cursor = db.rawQuery("SELECT * FROM workoutDates", null)
-
-    return dataSet
 }

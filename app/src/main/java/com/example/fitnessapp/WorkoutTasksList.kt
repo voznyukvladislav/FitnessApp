@@ -46,7 +46,8 @@ class WorkoutTasksList : Fragment() {
         workoutTasksList.layoutManager = manager
 
         val workoutId = arguments?.getInt("workoutId")!!
-        val dataSet: ArrayList<WorkoutTasksListItem> = getWorkoutTasksList(db, workoutId)
+        val listGetter = ListGetter(db)
+        val dataSet: ArrayList<WorkoutTasksListItem> = listGetter.getWorkoutTasksList(workoutId)
 
         val navController = (activity as MainActivity?)!!.findNavController(R.id.screen)
         val adapter = WorkoutTasksListAdapter(dataSet, db, workoutId, navController)
@@ -102,11 +103,13 @@ class WorkoutTasksList : Fragment() {
         val workoutTaskPopupWindowAcceptButton: Button = root.findViewById(R.id.workoutTaskPopupWindowAcceptButton)
         workoutTaskPopupWindowAcceptButton.setOnClickListener {
             val newName = newWorkoutTaskName.text.toString()
-            val insertedId = insertWorkoutTask(db, newName, workoutId)
-            val item = WorkoutTasksListItem(insertedId, newName)
-            dataSet.add(item)
-            workoutTasksList.adapter!!.notifyItemChanged(dataSet.size - 1)
-            workoutTaskPopupWindow.startAnimation(animationHide)
+            if(!newName.isNullOrBlank()) {
+                val insertedId = insertWorkoutTask(db, newName, workoutId)
+                val item = WorkoutTasksListItem(insertedId, newName)
+                dataSet.add(item)
+                workoutTasksList.adapter!!.notifyItemChanged(dataSet.size - 1)
+                workoutTaskPopupWindow.startAnimation(animationHide)
+            }
         }
 
         val workoutTaskPopupWindowCancelButton: Button = root.findViewById(R.id.workoutTaskPopupWindowCancelButton)
@@ -138,38 +141,6 @@ class WorkoutTasksList : Fragment() {
         })
 
         return root
-    }
-
-    private fun getWorkoutTasksList(db: SQLiteDatabase, workoutId: Int): ArrayList<WorkoutTasksListItem> {
-        val dataSet: ArrayList<WorkoutTasksListItem> = arrayListOf()
-
-        val workoutTasksCursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM workoutTasks WHERE workoutId = ${workoutId} AND isDeleted = 0 ORDER BY workoutTaskOrderNum", null)
-
-        var workoutTaskId = 0
-        var workoutTaskName = ""
-        var workoutSetsQuantity = 0
-        var workoutTaskRepetitionsQuantity = 0
-
-        var workoutSetsCursor: Cursor
-
-        while(workoutTasksCursor.moveToNext()) {
-            workoutTaskId = workoutTasksCursor.getInt(0)
-            workoutTaskName = workoutTasksCursor.getString(1)
-
-            workoutSetsCursor = db.rawQuery("SELECT COUNT(workoutSetId) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
-            while(workoutSetsCursor.moveToNext()) {
-                workoutSetsQuantity = workoutSetsCursor.getInt(0)
-            }
-
-            workoutSetsCursor = db.rawQuery("SELECT SUM(workoutSetRepetitions) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
-            while(workoutSetsCursor.moveToNext()) {
-                workoutTaskRepetitionsQuantity = workoutSetsCursor.getInt(0)
-            }
-
-            dataSet.add(WorkoutTasksListItem(workoutTaskId, workoutTaskName, workoutSetsQuantity, workoutTaskRepetitionsQuantity))
-        }
-
-        return dataSet
     }
 
     // Inserts new row in db and returns its primary key

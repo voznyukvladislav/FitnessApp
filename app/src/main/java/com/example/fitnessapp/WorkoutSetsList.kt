@@ -34,9 +34,9 @@ class WorkoutSetsList : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var root = inflater.inflate(R.layout.fragment_workout_sets_list, container, false)
+        val root = inflater.inflate(R.layout.fragment_workout_sets_list, container, false)
 
-        var db: SQLiteDatabase = this.requireContext().openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
+        val db: SQLiteDatabase = this.requireContext().openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
 
         val workoutId = arguments?.getInt("workoutId")
         val workoutTaskId = arguments?.getInt("workoutTaskId")
@@ -47,7 +47,8 @@ class WorkoutSetsList : Fragment() {
         val manager = LinearLayoutManager(this.requireContext())
         workoutSetsList.layoutManager = manager
 
-        var dataSet = getWorkoutSetsList(db, workoutTaskId!!)
+        val listGetter = ListGetter(db)
+        val dataSet = listGetter.getWorkoutSetsList(workoutTaskId!!)
 
         val adapter = WorkoutSetsListAdapter(db, dataSet, this.requireContext())
         workoutSetsList.adapter = adapter
@@ -120,12 +121,20 @@ class WorkoutSetsList : Fragment() {
         val workoutSetPopupWindowAcceptButton: Button = root.findViewById(R.id.workoutSetPopupWindowAcceptButton)
         val newSetRepetitionsNumEditText: EditText = root.findViewById(R.id.newSetRepetitionsNum)
         val newSetRestNumEditText: EditText = root.findViewById(R.id.newSetRestNum)
+        val newSetWeightNumEditText: EditText = root.findViewById(R.id.newSetWeight)
         workoutSetPopupWindowAcceptButton.setOnClickListener {
-            var newSetRepetitionsNum = newSetRepetitionsNumEditText.text.toString().toInt()
-            var newSetRestNum = newSetRestNumEditText.text.toString().toInt()
-            dataSet.add(insertSet(db, workoutTaskId, newSetRepetitionsNum, newSetRestNum))
-            workoutSetsList.adapter!!.notifyItemChanged(dataSet.size - 1)
-            workoutSetsPopupWindow.startAnimation(animationHide)
+            if(!newSetRepetitionsNumEditText.text.toString().isNullOrBlank() and !newSetRestNumEditText.text.toString().isNullOrBlank()) {
+                var newSetWeightNum: Int = 0
+                if(!newSetWeightNumEditText.text.toString().isNullOrBlank()) {
+                    newSetWeightNum = newSetWeightNumEditText.text.toString().toInt()
+                }
+                val newSetRepetitionsNum = newSetRepetitionsNumEditText.text.toString().toInt()
+                val newSetRestNum = newSetRestNumEditText.text.toString().toInt()
+
+                dataSet.add(insertSet(db, workoutTaskId, newSetRepetitionsNum, newSetRestNum, newSetWeightNum))
+                workoutSetsList.adapter!!.notifyItemChanged(dataSet.size - 1)
+                workoutSetsPopupWindow.startAnimation(animationHide)
+            }
         }
 
         val workoutSetPopupWindowCancelButton: Button = root.findViewById(R.id.workoutSetPopupWindowCancelButton)
@@ -155,6 +164,7 @@ class WorkoutSetsList : Fragment() {
             }
 
             override fun onAnimationEnd(animation: Animation?) {
+                clearInputFields(root)
             }
 
             override fun onAnimationRepeat(animation: Animation?) {
@@ -164,36 +174,13 @@ class WorkoutSetsList : Fragment() {
         return root
     }
 
-    private fun getWorkoutSetsList(db: SQLiteDatabase, workoutTaskId: Int): ArrayList<WorkoutSetsListItem> {
-        var dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
-
-        val cursor = db.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum " +
-                "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0 ORDER BY workoutSetOrderNum", null)
-
-        var workoutSetId: Int = 0
-        var workoutSetRepetitions: Int = 0
-        var workoutSetRest: Int = 0
-        var workoutSetOrderNum: Int = 0
-        while(cursor.moveToNext()) {
-            workoutSetId = cursor.getInt(0)
-            workoutSetRepetitions = cursor.getInt(1)
-            workoutSetRest = cursor.getInt(2)
-            workoutSetOrderNum = cursor.getInt(3)
-
-            var item = WorkoutSetsListItem(workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum)
-            dataSet.add(item)
-        }
-        cursor.close()
-
-        return dataSet
-    }
-
-    private fun insertSet(db: SQLiteDatabase, workoutTaskId: Int, workoutSetRepetitions: Int, workoutSetRest: Int): WorkoutSetsListItem {
+    private fun insertSet(db: SQLiteDatabase, workoutTaskId: Int, workoutSetRepetitions: Int, workoutSetRest: Int, workoutSetWeight: Int): WorkoutSetsListItem {
         db.execSQL("INSERT INTO workoutSets VALUES (NULL, " +
                 "${workoutTaskId}, " +
                 "${workoutSetRepetitions}, " +
                 "${workoutSetRest}, " +
                 "0," +
+                "${workoutSetWeight}," +
                 "0)")
 
         var insertedId = 0
@@ -203,7 +190,7 @@ class WorkoutSetsList : Fragment() {
         }
         cursor.close()
 
-        return WorkoutSetsListItem(insertedId, workoutSetRepetitions, workoutSetRest, 0)
+        return WorkoutSetsListItem(insertedId, workoutSetRepetitions, workoutSetRest, 0, workoutSetWeight)
     }
 
     private fun hideKeyboard() {
@@ -212,5 +199,15 @@ class WorkoutSetsList : Fragment() {
             val imm: InputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS)
         }
+    }
+
+    private fun clearInputFields(root: View) {
+        val newSetRepetitionsEditText: EditText = root.findViewById(R.id.newSetRepetitionsNum)
+        val newSetRestEditText: EditText = root.findViewById(R.id.newSetRestNum)
+        val newSetWeightEditText: EditText = root.findViewById(R.id.newSetWeight)
+
+        newSetRepetitionsEditText.setText("")
+        newSetRestEditText.setText("")
+        newSetWeightEditText.setText("")
     }
 }

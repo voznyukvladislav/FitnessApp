@@ -30,7 +30,8 @@ class Fitness : Fragment() {
         val root = inflater.inflate(R.layout.fragment_fitness, container, false)
         db = root.context.openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
 
-        val workoutsList = getWorkouts(db)
+        val listGetter = ListGetter(db)
+        val workoutsList = listGetter.getWorkoutsList()
         val workoutNames = getNamesAndNumbers(workoutsList)
 
         val workoutsSpinner: Spinner = root.findViewById(R.id.workoutsSpinner)
@@ -55,10 +56,9 @@ class Fitness : Fragment() {
         var isListShown: Boolean = false
         startWorkoutButton.setOnClickListener {
             if(selectedItemNum != -10) {
-                if(isListShown == false) {
+                val fitnessListRecyclerView: RecyclerView = root.findViewById(R.id.fitnessRecyclerView)
+                if(isListShown == false || fitnessListRecyclerView.visibility == View.GONE) {
                     val fitnessList = getFitnessList(db, workoutsList, selectedItemNum)
-
-                    val fitnessListRecyclerView: RecyclerView = root.findViewById(R.id.fitnessRecyclerView)
 
                     val manager = LinearLayoutManager(this.requireContext())
                     fitnessListRecyclerView.layoutManager = manager
@@ -104,77 +104,23 @@ class Fitness : Fragment() {
                 }
             }
         }
-
         return root
     }
 
     fun getFitnessList(db: SQLiteDatabase, workoutsList: ArrayList<WorkoutListItem>, selectedItemNum: Int): ArrayList<FitnessListItem> {
-        val workoutTasks = getWorkoutTasks(db, workoutsList[selectedItemNum].getId())
+        val listGetter = ListGetter(db)
+        val workoutTasks = listGetter.getWorkoutTasksList(workoutsList[selectedItemNum].getId())
         val fitnessList: ArrayList<FitnessListItem> = arrayListOf()
 
         for(i in 0 until workoutTasks.size) {
             fitnessList.add(FitnessListItem(workoutTasks[i].workoutTasksListItemName))
-
-            var workoutSets = getWorkoutSets(db, workoutTasks[i].workoutTasksListItemId)
+            val workoutSets = listGetter.getWorkoutSetsList(workoutTasks[i].workoutTasksListItemId)
             for(j in 0 until workoutSets.size) {
-                fitnessList.add(FitnessListItem(workoutSets[j].workoutSetRepetitions, workoutSets[j].workoutSetRest))
+                fitnessList.add(FitnessListItem(workoutSets[j].workoutSetRepetitions, workoutSets[j].workoutSetRest, workoutSets[j].workoutSetWeight))
             }
         }
         fitnessList.add(FitnessListItem())
         return fitnessList
-    }
-
-    fun getWorkouts(db: SQLiteDatabase): ArrayList<WorkoutListItem> { // Returns array with information about workouts from db
-        val cursor = db.rawQuery("SELECT workoutId, workoutName FROM Workouts WHERE isDeleted = 0 ORDER BY workoutOrderNum", null)
-        val workoutsArray = arrayListOf<WorkoutListItem>()
-
-        while(cursor.moveToNext()) {
-            workoutsArray.add(WorkoutListItem(cursor.getInt(0), cursor.getString(1)))
-        }
-        cursor.close()
-        return workoutsArray
-    }
-
-    fun getWorkoutTasks(db: SQLiteDatabase, workoutId: Int): ArrayList<WorkoutTasksListItem> {
-        val workoutTasks = arrayListOf<WorkoutTasksListItem>()
-        val cursor = db.rawQuery("SELECT workoutTaskId, workoutTaskName FROM WorkoutTasks WHERE workoutId = ${workoutId} AND isDeleted = 0 ORDER BY workoutTaskOrderNum", null)
-
-        var workoutTaskId = 0
-        var workoutTaskName = ""
-        while(cursor.moveToNext()) {
-            workoutTaskId = cursor.getInt(0)
-            workoutTaskName = cursor.getString(1)
-
-            var item = WorkoutTasksListItem(workoutTaskId, workoutTaskName)
-            workoutTasks.add(item)
-        }
-        cursor.close()
-
-        return workoutTasks
-    }
-
-    fun getWorkoutSets(db: SQLiteDatabase, workoutTaskId: Int): ArrayList<WorkoutSetsListItem> {
-        var dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
-        var cursor = db.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
-
-        var workoutSetId = 0
-        var workoutSetRepetitions = 0
-        var workoutSetRest = 0
-        var workoutSetOrderNum = 0
-        while(cursor.moveToNext()) {
-            workoutSetId = cursor.getInt(0)
-            workoutSetRepetitions = cursor.getInt(1)
-            workoutSetRest = cursor.getInt(2)
-            workoutSetOrderNum = cursor.getInt(3)
-
-            var item = WorkoutSetsListItem(workoutSetId,
-                workoutSetRepetitions,
-                workoutSetRest,
-                workoutSetOrderNum)
-            dataSet.add(item)
-        }
-        cursor.close()
-        return dataSet
     }
 
     fun getNamesAndNumbers(arr: ArrayList<WorkoutListItem>): ArrayList<String> { // Returns array with names and numeration of workouts

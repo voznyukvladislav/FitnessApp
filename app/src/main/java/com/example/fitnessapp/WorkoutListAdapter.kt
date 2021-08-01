@@ -51,7 +51,7 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("UPDATE Workouts SET isDeleted = 1 WHERE workoutId = ${values.get(position).getId()}")
+        db.execSQL("UPDATE workouts SET isDeleted = 1 WHERE workoutId = ${values.get(position).getId()}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }

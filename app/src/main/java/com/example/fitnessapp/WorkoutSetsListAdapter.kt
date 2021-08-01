@@ -30,6 +30,7 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
 
         holder.workoutSetRepetitions?.setText("Repetitions: ${item.workoutSetRepetitions}")
         holder.workoutSetRest?.setText("Rest: ${item.workoutSetRest}")
+        holder.workoutSetWeight?.setText("Weight: ${item.workoutSetWeight}")
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int): ArrayList<WorkoutSetsListItem> {
@@ -56,66 +57,12 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
     class workoutSetsListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         var workoutSetRepetitions: TextView? = null
         var workoutSetRest: TextView? = null
+        var workoutSetWeight: TextView? = null
 
         init {
             workoutSetRepetitions = itemView.findViewById(R.id.repetitionsNumber)
             workoutSetRest = itemView.findViewById(R.id.restNumber)
-        }
-    }
-}
-
-class WorkoutSetsListItem {
-    var workoutSetId: Int = 0
-        get() = field
-        set(value) { field = value }
-
-    var workoutSetRepetitions: Int = 0
-        get() = field
-        set(value) { field = value }
-
-    var workoutSetRest: Int = 0
-        get() = field
-        set(value) { field = value }
-
-    var workoutSetOrderNum: Int = 0
-        get() = field
-        set(value) { field = value }
-
-    constructor(workoutSetId: Int,
-                workoutSetRepetitions: Int,
-                workoutSetRest: Int,
-                workoutSetOrderNum: Int) {
-        this.workoutSetId = workoutSetId
-        this.workoutSetRepetitions = workoutSetRepetitions
-        this.workoutSetRest = workoutSetRest
-        this.workoutSetOrderNum = workoutSetOrderNum
-    }
-}
-
-class WorkoutSetsListAdapterManager(var adapter: WorkoutSetsListAdapter,
-                                     dragDirs: Int,
-                                     swipeDirs: Int,
-                                     var db: SQLiteDatabase
-): ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
-    override fun onMove(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
-    ): Boolean {
-        var values = adapter.swapItems(viewHolder.adapterPosition, target.adapterPosition)
-        CoroutineScope(Dispatchers.IO).launch {
-            updateOrderNums(values)
-        }
-        return true
-    }
-
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        adapter.onItemDismiss(viewHolder.adapterPosition)
-    }
-
-    fun updateOrderNums(values: ArrayList<WorkoutSetsListItem>) {
-        for(i in 0 until values.size) {
-            db.execSQL("UPDATE workoutSets SET workoutSetOrderNum = ${i + 1} WHERE workoutSetId = ${values[i].workoutSetId}")
+            workoutSetWeight = itemView.findViewById(R.id.weightNumber)
         }
     }
 }
