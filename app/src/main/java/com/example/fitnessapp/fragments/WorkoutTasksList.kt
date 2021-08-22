@@ -1,8 +1,6 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.fragments
 
 import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.UnderlineSpan
@@ -22,6 +20,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.KeyboardHider
+import com.example.fitnessapp.MainActivity
+import com.example.fitnessapp.R
+import com.example.fitnessapp.sql.SQLInserter
+import com.example.fitnessapp.sql.SQLListGetter
+import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListAdapter
+import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListAdapterManager
+import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListItem
+import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListPopupAddWindow
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -46,11 +53,11 @@ class WorkoutTasksList : Fragment() {
         workoutTasksList.layoutManager = manager
 
         val workoutId = arguments?.getInt("workoutId")!!
-        val listGetter = ListGetter(db)
+        val listGetter = SQLListGetter(db)
         val dataSet: ArrayList<WorkoutTasksListItem> = listGetter.getWorkoutTasksList(workoutId)
 
         val navController = (activity as MainActivity?)!!.findNavController(R.id.screen)
-        val adapter = WorkoutTasksListAdapter(dataSet, db, workoutId, navController)
+        val adapter = WorkoutTasksListAdapter(dataSet, db, workoutId, navController, root)
         workoutTasksList.adapter = adapter
 
         val dividerItemDecoration = DividerItemDecoration(this.context, manager.orientation)
@@ -65,7 +72,7 @@ class WorkoutTasksList : Fragment() {
 
         // Navigation bar
         // Getting related workout name
-        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId} AND isDeleted = 0", null)
+        val workoutsCursor = db.rawQuery("SELECT workoutName FROM Workouts WHERE workoutId = ${workoutId}", null)
         var workoutName = ""
         while(workoutsCursor.moveToNext()) {
             workoutName = workoutsCursor.getString(0)
@@ -84,86 +91,32 @@ class WorkoutTasksList : Fragment() {
         }
         // Navigation bar end
 
-        // Animations
-        val animationShow: Animation = AnimationUtils.loadAnimation(root.context, R.anim.popup_show)
-        val animationHide: Animation = AnimationUtils.loadAnimation(root.context, R.anim.popup_hide)
 
+        // Popup window
+        val workoutTasksListPopupAddWindow = WorkoutTasksListPopupAddWindow(root)
         val addWorkoutTaskListItemButton: FloatingActionButton = root.findViewById(R.id.addWorkoutTaskButton)
-        var isOpenedPopupWindow: Boolean = false
-        val workoutTaskPopupWindow: ConstraintLayout = root.findViewById(R.id.workoutTaskPopupWindow)
         addWorkoutTaskListItemButton.setOnClickListener {
-            if(!isOpenedPopupWindow) {
-                workoutTaskPopupWindow.visibility = View.VISIBLE
-                workoutTaskPopupWindow.startAnimation(animationShow)
-
-            }
+            workoutTasksListPopupAddWindow.show()
         }
 
-        val newWorkoutTaskName: EditText = root.findViewById(R.id.newWorkoutTaskName)
-        val workoutTaskPopupWindowAcceptButton: Button = root.findViewById(R.id.workoutTaskPopupWindowAcceptButton)
-        workoutTaskPopupWindowAcceptButton.setOnClickListener {
-            val newName = newWorkoutTaskName.text.toString()
+        workoutTasksListPopupAddWindow.acceptButton.setOnClickListener {
+            val newName = workoutTasksListPopupAddWindow.newWorkoutTaskName.text.toString()
             if(!newName.isNullOrBlank()) {
-                val insertedId = insertWorkoutTask(db, newName, workoutId)
-                val item = WorkoutTasksListItem(insertedId, newName)
+                workoutTasksListPopupAddWindow.addWorkoutListItem(db, workoutId)
+                val item = SQLInserter(db).getInsertedWorkoutTask()
                 dataSet.add(item)
                 workoutTasksList.adapter!!.notifyItemChanged(dataSet.size - 1)
-                workoutTaskPopupWindow.startAnimation(animationHide)
+                workoutTasksListPopupAddWindow.hide()
+                workoutTasksListPopupAddWindow.clearInputFields()
+                KeyboardHider(root).hideKeyboard()
             }
         }
 
-        val workoutTaskPopupWindowCancelButton: Button = root.findViewById(R.id.workoutTaskPopupWindowCancelButton)
-        workoutTaskPopupWindowCancelButton.setOnClickListener {
-            workoutTaskPopupWindow.startAnimation(animationHide)
+        workoutTasksListPopupAddWindow.cancelButton.setOnClickListener {
+            workoutTasksListPopupAddWindow.hide()
         }
-
-        animationShow.setAnimationListener(object: Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                isOpenedPopupWindow = true
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-            }
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-        })
-
-        animationHide.setAnimationListener(object: Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                workoutTaskPopupWindow.visibility = View.GONE
-                isOpenedPopupWindow = false
-                hideKeyboard()
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-                clearInput(newWorkoutTaskName)
-            }
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-        })
 
         return root
-    }
-
-    // Inserts new row in db and returns its primary key
-    private fun insertWorkoutTask(db: SQLiteDatabase, workoutTaskName: String, workoutId: Int): Int {
-        db.execSQL("INSERT INTO workoutTasks VALUES (NULL, ${workoutId}, '${workoutTaskName}', 0, 0)")
-        var workoutTaskId = 0
-        val cursor = db.rawQuery("SELECT MAX(workoutTaskId) FROM workoutTasks", null)
-        while(cursor.moveToNext()) {
-            workoutTaskId = cursor.getInt(0)
-        }
-        return workoutTaskId
-    }
-
-    private fun clearInput(input: EditText) {
-        input.setText("")
-    }
-
-    private fun hideKeyboard() {
-        val view: View? = this.view
-        if(view != null) {
-            val imm: InputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS)
-        }
     }
 }
 

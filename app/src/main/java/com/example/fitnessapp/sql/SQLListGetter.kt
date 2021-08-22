@@ -1,9 +1,13 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.sql
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.example.fitnessapp.DoneWorkoutListItem
+import com.example.fitnessapp.workout_list.WorkoutListItem
+import com.example.fitnessapp.workout_sets_list.WorkoutSetsListItem
+import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListItem
 
-class ListGetter {
+class SQLListGetter {
     var db: SQLiteDatabase? = null
     get() = field
     private set(value) { field = value }
@@ -14,7 +18,7 @@ class ListGetter {
 
     fun getWorkoutsList(): ArrayList<WorkoutListItem> {
         val dataSet: ArrayList<WorkoutListItem> = arrayListOf()
-        val query = (this.db!!).rawQuery("SELECT * FROM workouts WHERE isDeleted = 0 ORDER BY workoutOrderNum", null)
+        val query = (this.db!!).rawQuery("SELECT * FROM workouts ORDER BY workoutOrderNum", null)
 
         while(query.moveToNext()) {
             // Creates new WorkoutListItem object with id and name
@@ -24,10 +28,31 @@ class ListGetter {
         return dataSet
     }
 
+    fun getWorkoutsListWithTotalTasks(): ArrayList<WorkoutListItem> {
+        val dataSet: ArrayList<WorkoutListItem> = arrayListOf()
+        val workoutCursor = (this.db!!).rawQuery("SELECT * FROM workouts ORDER BY workoutOrderNum", null)
+
+        while(workoutCursor.moveToNext()) {
+            val workoutId = workoutCursor.getInt(0)
+            val workoutName = workoutCursor.getString(1)
+
+            val workoutTasksCursor = (this.db)!!.rawQuery("SELECT COUNT(workoutTaskId) FROM workoutTasks WHERE workoutId = ${workoutId}", null)
+            var workoutTotalTasks = 0
+            while(workoutTasksCursor.moveToNext()) {
+                workoutTotalTasks = workoutTasksCursor.getInt(0)
+            }
+            workoutTasksCursor.close()
+
+            dataSet.add(WorkoutListItem(workoutId, workoutName, workoutTotalTasks))
+        }
+        workoutCursor.close()
+        return dataSet
+    }
+
     fun getWorkoutTasksList(workoutId: Int): ArrayList<WorkoutTasksListItem> {
         val dataSet: ArrayList<WorkoutTasksListItem> = arrayListOf()
 
-        val workoutTasksCursor = this.db!!.rawQuery("SELECT workoutTaskId, workoutTaskName FROM workoutTasks WHERE workoutId = ${workoutId} AND isDeleted = 0 ORDER BY workoutTaskOrderNum", null)
+        val workoutTasksCursor = this.db!!.rawQuery("SELECT workoutTaskId, workoutTaskName FROM workoutTasks WHERE workoutId = ${workoutId} ORDER BY workoutTaskOrderNum", null)
 
         var workoutTaskId = 0
         var workoutTaskName = ""
@@ -40,12 +65,12 @@ class ListGetter {
             workoutTaskId = workoutTasksCursor.getInt(0)
             workoutTaskName = workoutTasksCursor.getString(1)
 
-            workoutSetsCursor = this.db!!.rawQuery("SELECT COUNT(workoutSetId) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
+            workoutSetsCursor = this.db!!.rawQuery("SELECT COUNT(workoutSetId) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId}", null)
             while(workoutSetsCursor.moveToNext()) {
                 workoutSetsQuantity = workoutSetsCursor.getInt(0)
             }
 
-            workoutSetsCursor = this.db!!.rawQuery("SELECT SUM(workoutSetRepetitions) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0", null)
+            workoutSetsCursor = this.db!!.rawQuery("SELECT SUM(workoutSetRepetitions) FROM workoutSets WHERE workoutTaskId = ${workoutTaskId}", null)
             while(workoutSetsCursor.moveToNext()) {
                 workoutTaskRepetitionsQuantity = workoutSetsCursor.getInt(0)
             }
@@ -62,21 +87,19 @@ class ListGetter {
         val dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
 
         val cursor = this.db!!.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum, workoutSetWeight " +
-                "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} AND isDeleted = 0 ORDER BY workoutSetOrderNum", null)
+                "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} ORDER BY workoutSetOrderNum", null)
 
         var workoutSetId: Int = 0
         var workoutSetRepetitions: Int = 0
         var workoutSetRest: Int = 0
-        var workoutSetOrderNum: Int = 0
         var workoutSetWeight: Int = 0
         while(cursor.moveToNext()) {
             workoutSetId = cursor.getInt(0)
             workoutSetRepetitions = cursor.getInt(1)
             workoutSetRest = cursor.getInt(2)
-            workoutSetOrderNum = cursor.getInt(3)
-            workoutSetWeight = cursor.getInt(4)
+            workoutSetWeight = cursor.getInt(3)
 
-            val item = WorkoutSetsListItem(workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum, workoutSetWeight)
+            val item = WorkoutSetsListItem(workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetWeight)
             dataSet.add(item)
         }
         cursor.close()

@@ -4,59 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.WorkoutTasksList">
+    tools:context=".fragments.WorkoutsList">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/trainingListMainScreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/workoutTasksList"
+            android:id="@+id/workoutList"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/navigationBarInWorkoutTasks"
-
-
-            app:layout_constraintVertical_bias="0.554"
-            tools:listitem="@layout/workout_task_list_item">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/navigationBarInWorkoutTasks"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_margin="7dp"
-            android:background="@drawable/rounded_window_blue"
-            app:layout_constraintBottom_toBottomOf="@+id/workoutTasksList"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="13dp">
-
-            <TextView
-                android:id="@+id/workoutNameInWorkoutTasksNavigationBar"
-                android:textSize="20dp"
-                android:textStyle=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.047"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.451" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            tools:listitem="@layout/workout_list_item" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/addWorkoutTaskButton"
+            android:id="@+id/addButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/orange"
+            android:backgroundTint="@color/red"
             android:clickable="true"
             android:src="@drawable/add"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -67,18 +36,18 @@
             app:layout_constraintVertical_bias="0.917" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/workoutTaskPopupAddWindow"
+            android:id="@+id/workoutListPopupWindow"
             android:visibility="gone"
             android:layout_width="301dp"
             android:layout_height="159dp"
-            android:background="@drawable/rounded_window_orange"
+            android:background="@drawable/rounded_window_red"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/newWorkoutTaskName"
+                android:id="@+id/newWorkoutName"
                 android:layout_width="259dp"
                 android:layout_height="55dp"
                 android:ems="10"
@@ -92,7 +61,7 @@
                 app:layout_constraintVertical_bias="0.243" />
 
             <Button
-                android:id="@+id/workoutTaskPopupAddWindowCancelButton"
+                android:id="@+id/cancelWorkoutsPopupWindowButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
                 android:text="Cancel"
@@ -104,10 +73,10 @@
                 app:layout_constraintVertical_bias="0.872" />
 
             <Button
-                android:id="@+id/workoutTaskPopupAddWindowAcceptButton"
+                android:id="@+id/addWorkoutsPopupWindowButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
-                android:backgroundTint="@color/orange"
+                android:backgroundTint="@color/red"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -117,20 +86,21 @@
                 app:layout_constraintVertical_bias="0.872" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/workoutTaskPopupEditWindow"
+            android:id="@+id/workoutListEditPopupWindow"
             android:visibility="gone"
             android:layout_width="301dp"
             android:layout_height="159dp"
-            android:background="@drawable/rounded_window_orange"
+            android:background="@drawable/rounded_window_red"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/editWorkoutTaskName"
+                android:id="@+id/editWorkoutName"
                 android:layout_width="259dp"
                 android:layout_height="55dp"
                 android:ems="10"
@@ -144,7 +114,7 @@
                 app:layout_constraintVertical_bias="0.243" />
 
             <Button
-                android:id="@+id/workoutTaskPopupEditWindowCancelButton"
+                android:id="@+id/cancelWorkoutsListPopupEditWindowButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
                 android:text="Cancel"
@@ -156,10 +126,10 @@
                 app:layout_constraintVertical_bias="0.872" />
 
             <Button
-                android:id="@+id/workoutTaskPopupEditWindowAcceptButton"
+                android:id="@+id/editWorkoutsPopupEditWindowButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
-                android:backgroundTint="@color/orange"
+                android:backgroundTint="@color/red"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -169,6 +139,8 @@
                 app:layout_constraintVertical_bias="0.872" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

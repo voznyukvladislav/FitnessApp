@@ -1,29 +1,29 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_tasks_list
 
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.NavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.fitnessapp.KeyboardHider
+import com.example.fitnessapp.R
 
 class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
                               var db: SQLiteDatabase,
                               var workoutId: Int,
-                              var navController: NavController): RecyclerView.Adapter<WorkoutTasksListAdapter.WorkoutTasksListViewHolder>() {
+                              var navController: NavController,
+                              var root: View): RecyclerView.Adapter<WorkoutTasksListAdapter.WorkoutTasksListViewHolder>() {
     override fun getItemCount(): Int {
         return values.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkoutTasksListViewHolder {
         val itemView = LayoutInflater.from(parent?.context).inflate(R.layout.workout_task_list_item, parent, false)
-        return WorkoutTasksListAdapter.WorkoutTasksListViewHolder(itemView)
+        return WorkoutTasksListViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: WorkoutTasksListViewHolder, position: Int) {
@@ -37,6 +37,28 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
             bundle.putInt("workoutId", workoutId)
             bundle.putInt("workoutTaskId", item.workoutTasksListItemId)
             navController.navigate(R.id.action_workoutTasksList_to_workoutSetsList, bundle)
+        }
+
+        holder.editWorkoutTasksListItem!!.setOnClickListener {
+            val workoutTasksListPopupEditWindow = WorkoutTasksListPopupEditWindow(root)
+            workoutTasksListPopupEditWindow.setInputFieldValue(values[position].workoutTasksListItemName)
+            workoutTasksListPopupEditWindow.show()
+
+            workoutTasksListPopupEditWindow.acceptButton.setOnClickListener {
+                if(!workoutTasksListPopupEditWindow.editWorkoutTaskNameEditText.text.toString().isNullOrBlank()) {
+                    workoutTasksListPopupEditWindow.updateWorkoutTask(db, values[position].workoutTasksListItemId)
+                    workoutTasksListPopupEditWindow.hide()
+                    KeyboardHider(root).hideKeyboard()
+
+                    values[position].workoutTasksListItemName = workoutTasksListPopupEditWindow.editWorkoutTaskNameEditText.text.toString()
+                    this.notifyItemChanged(position)
+                }
+            }
+
+            workoutTasksListPopupEditWindow.cancelButton.setOnClickListener {
+                workoutTasksListPopupEditWindow.hide()
+                KeyboardHider(root).hideKeyboard()
+            }
         }
     }
 
@@ -56,7 +78,7 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("UPDATE workoutTasks SET isDeleted = 1 WHERE workoutTaskId = ${values[position].workoutTasksListItemId}")
+        db.execSQL("DELETE FROM workoutTasks WHERE workoutTaskId = ${values[position].workoutTasksListItemId}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }
@@ -65,10 +87,15 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
         var workoutTasksListItemName: TextView? = null
         var workoutTasksListItemTotalSets: TextView? = null
         var workoutTasksListItemTotalRepetitions: TextView? = null
+
+        var editWorkoutTasksListItem: Button? = null
+
         init {
             workoutTasksListItemName = itemView.findViewById(R.id.doneWorkoutName)
             workoutTasksListItemTotalSets = itemView.findViewById(R.id.workoutTotalSets)
             workoutTasksListItemTotalRepetitions = itemView.findViewById(R.id.workoutTotalRepetitions)
+
+            editWorkoutTasksListItem = itemView.findViewById(R.id.editWorkoutTaskListItem)
         }
     }
 }

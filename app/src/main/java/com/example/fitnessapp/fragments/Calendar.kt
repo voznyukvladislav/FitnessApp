@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.fragments
 
 import android.app.Activity
 import android.content.Context
@@ -16,6 +16,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import android.database.sqlite.SQLiteDatabase
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.*
+import com.example.fitnessapp.sql.SQLListGetter
 
 
 class Calendar : Fragment() {
@@ -75,7 +77,7 @@ class CurrentDayDecorator(context: Activity?, currentDay: CalendarDay) : DayView
 fun getDoneWorkoutsListRecyclerView(db: SQLiteDatabase, dates: ArrayList<WorkoutDatesListItem>): ArrayList<DoneWorkoutsRecyclerViewItem> {
     val dataSet: ArrayList<DoneWorkoutsRecyclerViewItem> = arrayListOf()
 
-    val listGetter = ListGetter(db)
+    val listGetter = SQLListGetter(db)
     for(i in 0 until dates.size) {
         dataSet.add(DoneWorkoutsRecyclerViewItem(dates[i].day, dates[i].month, dates[i].year))
         val relatedDoneWorkouts = listGetter.getDoneWorkoutsFromDate(dates[i].dateId)
@@ -89,7 +91,7 @@ fun getDoneWorkoutsListRecyclerView(db: SQLiteDatabase, dates: ArrayList<Workout
 
 fun getDates(db: SQLiteDatabase): ArrayList<WorkoutDatesListItem> {
     val datesList: ArrayList<WorkoutDatesListItem> = arrayListOf()
-    val cursor = db.rawQuery("SELECT * FROM calendarDates", null)
+    val cursor = db.rawQuery("SELECT * FROM calendarDates ORDER BY calendarDateId DESC", null)
 
     var dateId = 0
     var day = ""

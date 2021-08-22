@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_tasks_list
 
 class WorkoutTasksListItem {
     var workoutTasksListItemId: Int = 0

@@ -1,18 +1,11 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.fragments
 
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -20,6 +13,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.*
+import com.example.fitnessapp.sql.SQLInserter
+import com.example.fitnessapp.sql.SQLListGetter
+import com.example.fitnessapp.workout_list.WorkoutListAdapter
+import com.example.fitnessapp.workout_list.WorkoutListItem
+import com.example.fitnessapp.workout_list.WorkoutListManageAdapter
+import com.example.fitnessapp.workout_list.WorkoutsListPopupAddWindow
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -32,13 +32,6 @@ class WorkoutsList : Fragment() {
     private lateinit var dataSet: ArrayList<WorkoutListItem>
     private lateinit var workoutListRecyclerView: RecyclerView
 
-    private lateinit var mainScreen: ConstraintLayout
-    private lateinit var addWindow: ConstraintLayout
-
-    private lateinit var newWorkoutName: EditText
-
-    private lateinit var addWorkout: Button
-    private lateinit var cancel: Button
     private lateinit var add: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,17 +40,14 @@ class WorkoutsList : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_training_list, container, false)
+        val root = inflater.inflate(R.layout.fragment_workouts_list, container, false)
         db = root.context.openOrCreateDatabase("workout.db", MODE_PRIVATE, null)
         createDatabaseTables(db)
 
-        val listGetter = ListGetter(db)
-        dataSet = listGetter.getWorkoutsList()
+        val listGetter = SQLListGetter(db)
+        dataSet = listGetter.getWorkoutsListWithTotalTasks()
 
         navController = (activity as MainActivity?)!!.findNavController(R.id.screen)
-
-        // TextEdit new workout name
-        newWorkoutName = root.findViewById(R.id.newWorkoutName)
 
         // Start recycler view setup
         workoutListRecyclerView = root.findViewById<RecyclerView>(R.id.workoutList)
@@ -65,7 +55,7 @@ class WorkoutsList : Fragment() {
         val manager = LinearLayoutManager(this.context)
         workoutListRecyclerView.layoutManager = manager
 
-        val adapter = WorkoutListAdapter(dataSet, this.context, db, navController)
+        val adapter = WorkoutListAdapter(dataSet, this.context, db, navController, root)
         workoutListRecyclerView.adapter = adapter
 
         val dividerItemDecoration = DividerItemDecoration(this.context, manager.orientation)
@@ -77,83 +67,28 @@ class WorkoutsList : Fragment() {
         helper.attachToRecyclerView(workoutListRecyclerView)
         // End recycler view setup
 
-        var isOpenedAddWindow: Boolean = false
 
-        // Windows declaration
-        mainScreen = root.findViewById(R.id.trainingListMainScreen)
-        addWindow = root.findViewById(R.id.workoutTasksListPopupWindow)
-
-        // Buttons declaration
-        addWorkout = root.findViewById(R.id.addWorkout)
-        cancel = root.findViewById(R.id.cancel)
+        val workoutListPopupAddWindow = WorkoutsListPopupAddWindow(root)
         add = root.findViewById(R.id.addButton)
-
-        // Animations declaration
-        val animationHide: Animation = AnimationUtils.loadAnimation(root.context, R.anim.popup_hide)
-        val animationShow: Animation = AnimationUtils.loadAnimation(root.context, R.anim.popup_show)
-
-        // Main screen listener
-        mainScreen.setOnClickListener {
-            if(isOpenedAddWindow == true) {
-                isOpenedAddWindow = false
-                addWindow.startAnimation(animationHide)
-                //addWindow.visibility = View.GONE
-            }
-        }
-
-        // Add window listener
-        addWindow.setOnClickListener {
-            hideKeyboard()
-        }
-
-        // Hide animation listener
-        animationHide.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                hideKeyboard()
-            }
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-                newWorkoutName.setText("")
-                addWindow.visibility = View.GONE
-            }
-        })
 
         // Floating action button click listener
         add.setOnClickListener {
-            if(isOpenedAddWindow == false) {
-                isOpenedAddWindow = true
-                addWindow.visibility = View.VISIBLE
-                addWindow.startAnimation(animationShow)
-            }
+            workoutListPopupAddWindow.acceptButton.setText("Add")
+            workoutListPopupAddWindow.show()
         }
 
         // Adding new workout to database
-        addWorkout.setOnClickListener {
-            if(!newWorkoutName.text.toString().isNullOrBlank()) {
-                isOpenedAddWindow = false
+        workoutListPopupAddWindow.acceptButton.setOnClickListener {
+            if(!workoutListPopupAddWindow.workoutNameEditText.text.toString().isNullOrBlank()) {
+                workoutListPopupAddWindow.add(db)
+                workoutListPopupAddWindow.hide()
 
-                db.execSQL("INSERT INTO workouts VALUES(NULL, '${newWorkoutName.text.toString()}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts), 0)")
-
-                val cursor = db.rawQuery("SELECT MAX(workoutId) FROM Workouts", null)
-                var workoutId: Int = 0
-                if(cursor.moveToFirst()) {
-                    workoutId = cursor.getInt(0)
-                }
-                cursor.close()
-                val workoutListItem = WorkoutListItem(workoutId, newWorkoutName.text.toString()) // TODO rework order num
+                val workoutListItem = SQLInserter(db).getInsertedWorkout()
                 dataSet.add(workoutListItem)
 
                 workoutListRecyclerView.adapter!!.notifyItemChanged(dataSet.size - 1)
-                addWindow.startAnimation(animationHide)
+                KeyboardHider(root).hideKeyboard()
             }
-        }
-
-        // Cancel click listener
-        cancel.setOnClickListener {
-            isOpenedAddWindow = false
-            addWindow.startAnimation(animationHide)
         }
 
         return root
@@ -165,15 +100,13 @@ class WorkoutsList : Fragment() {
         db.execSQL("CREATE TABLE IF NOT EXISTS workouts " +
                 "(workoutId INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "workoutName TEXT," +
-                "workoutOrderNum INTEGER," +
-                "isDeleted INTEGER)")
+                "workoutOrderNum INTEGER)")
 
         db.execSQL("CREATE TABLE IF NOT EXISTS workoutTasks " +
                 "(workoutTaskId INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "workoutId INTEGER," +
                 "workoutTaskName TEXT," +
-                "workoutTaskOrderNum INTEGER," +
-                "isDeleted INTEGER)")
+                "workoutTaskOrderNum INTEGER)")
 
         db.execSQL("CREATE TABLE IF NOT EXISTS workoutSets " +
                 "(workoutSetId INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -181,8 +114,7 @@ class WorkoutsList : Fragment() {
                 "workoutSetRepetitions INTEGER," +
                 "workoutSetRest INTEGER," +
                 "workoutSetOrderNum INTEGER," +
-                "workoutSetWeight," +
-                "isDeleted INTEGER)")
+                "workoutSetWeight)")
 
         // Done workout tables
         db.execSQL("CREATE TABLE IF NOT EXISTS doneWorkouts " +
@@ -213,13 +145,5 @@ class WorkoutsList : Fragment() {
                 "(doneWorkoutRecordId INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "doneWorkoutId INTEGER," +
                 "workoutDateId INTEGER)")
-    }
-
-    private fun hideKeyboard() {
-        val view: View? = this.view
-        if(view != null) {
-            val imm: InputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS)
-        }
     }
 }

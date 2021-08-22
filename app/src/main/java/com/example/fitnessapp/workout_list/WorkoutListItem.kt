@@ -1,8 +1,9 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_list
 
 class WorkoutListItem {
     private var id: Int = 0
     private var workoutName: String = ""
+    private var workoutTotalTasks = 0
     private var color: String = "" // Will be added in future
 
 
@@ -12,24 +13,27 @@ class WorkoutListItem {
         this.workoutName = workoutName
     }
 
+    constructor(id: Int, workoutName: String, workoutTotalTasks: Int) {
+        this.id = id
+        this.workoutName = workoutName
+        this.workoutTotalTasks = workoutTotalTasks
+    }
+
     // Getters
     fun getId(): Int {
         return this.id
     }
-    /*fun getId(db: SQLiteDatabase): Int {
-        var cursor: Cursor = db.rawQuery("SELECT workoutId FROM workouts WHERE name = '${this.getName()}'", null)
-        if(cursor.moveToFirst()) {
-            return cursor.getString(0).toInt()
-        }
-        cursor.close()
-        return 0
-    }*/
+
     fun getName(): String {
         return this.workoutName
+    }
+    fun getTotalTasks(): Int {
+        return this.workoutTotalTasks
     }
     fun getColor(): String {
         return this.color
     }
+
 
     // Setters
     fun setId(newId: Int) {

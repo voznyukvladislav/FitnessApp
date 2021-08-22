@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/training_list"
-        android:name="com.example.fitnessapp.WorkoutsList"
+        android:name="com.example.fitnessapp.fragments.WorkoutsList"
         android:label="fragment_training_list"
-        tools:layout="@layout/fragment_training_list" >
+        tools:layout="@layout/fragment_workouts_list" >
         <action
             android:id="@+id/action_training_list_to_workoutTasksList"
             app:destination="@id/workoutTasksList"
@@ -18,22 +18,22 @@
     </fragment>
     <fragment
         android:id="@+id/fitness"
-        android:name="com.example.fitnessapp.Fitness"
+        android:name="com.example.fitnessapp.fragments.Fitness"
         android:label="fragment_fitness"
         tools:layout="@layout/fragment_fitness" />
     <fragment
         android:id="@+id/calendar"
-        android:name="com.example.fitnessapp.Calendar"
+        android:name="com.example.fitnessapp.fragments.Calendar"
         android:label="fragment_calendar"
         tools:layout="@layout/fragment_calendar" />
     <fragment
         android:id="@+id/settings"
-        android:name="com.example.fitnessapp.Settings"
+        android:name="com.example.fitnessapp.fragments.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/workoutTasksList"
-        android:name="com.example.fitnessapp.WorkoutTasksList"
+        android:name="com.example.fitnessapp.fragments.WorkoutTasksList"
         android:label="fragment_workout_tasks_list"
         tools:layout="@layout/fragment_workout_tasks_list" >
         <action
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/workoutSetsList"
-        android:name="com.example.fitnessapp.WorkoutSetsList"
+        android:name="com.example.fitnessapp.fragments.WorkoutSetsList"
         android:label="fragment_workout_sets_list"
         tools:layout="@layout/fragment_workout_sets_list" >
         <action

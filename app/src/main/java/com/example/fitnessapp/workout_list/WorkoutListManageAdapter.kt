@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_list
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

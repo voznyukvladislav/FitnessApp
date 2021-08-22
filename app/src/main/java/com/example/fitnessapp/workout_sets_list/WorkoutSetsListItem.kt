@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_sets_list
 
 class WorkoutSetsListItem {
     var workoutSetId: Int = 0
@@ -13,10 +13,6 @@ class WorkoutSetsListItem {
         get() = field
         set(value) { field = value }
 
-    var workoutSetOrderNum: Int = 0
-        get() = field
-        set(value) { field = value }
-
     var workoutSetWeight: Int = 0
         get() = field
         set(value) { field = value }
@@ -24,12 +20,10 @@ class WorkoutSetsListItem {
     constructor(workoutSetId: Int,
                 workoutSetRepetitions: Int,
                 workoutSetRest: Int,
-                workoutSetOrderNum: Int,
                 workoutSetWeight: Int) {
         this.workoutSetId = workoutSetId
         this.workoutSetRepetitions = workoutSetRepetitions
         this.workoutSetRest = workoutSetRest
-        this.workoutSetOrderNum = workoutSetOrderNum
         this.workoutSetWeight = workoutSetWeight
     }
 

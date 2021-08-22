@@ -27,7 +27,7 @@ class DoneWorkoutsListAdapter(val values: ArrayList<DoneWorkoutsRecyclerViewItem
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if(getItemViewType(position) == TYPE_DONE_WORKOUT) {
-            (holder as DoneWorkoutsListItemViewHolder).doneWorkoutName!!.text = values[position].doneWorkoutName
+            (holder as DoneWorkoutsListItemViewHolder).doneWorkoutName!!.text = "Done workout name: ${values[position].doneWorkoutName}"
         } else {
             (holder as DoneWorkoutsListDateViewHolder).doneWorkoutDate!!.text = "${values[position].doneWorkoutDateDay}.${values[position].doneWorkoutDateMonth}.${values[position].doneWorkoutDateYear}"
         }

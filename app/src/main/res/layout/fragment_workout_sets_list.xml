@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WorkoutTasksList">
+    tools:context=".fragments.WorkoutTasksList">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -77,7 +77,7 @@
             app:layout_constraintVertical_bias="0.917" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/workoutSetsPopupWindow"
+            android:id="@+id/workoutSetsPopupAddWindow"
             android:layout_width="310dp"
             android:layout_height="280dp"
             android:background="@drawable/rounded_window_yellow"
@@ -133,7 +133,7 @@
                 app:layout_constraintVertical_bias="0.608" />
 
             <Button
-                android:id="@+id/workoutSetPopupWindowCancelButton"
+                android:id="@+id/workoutSetPopupAddWindowCancelButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
                 android:text="Cancel"
@@ -145,7 +145,7 @@
                 app:layout_constraintVertical_bias="0.872" />
 
             <Button
-                android:id="@+id/workoutSetPopupWindowAcceptButton"
+                android:id="@+id/workoutSetPopupAddWindowAcceptButton"
                 android:layout_width="95dp"
                 android:layout_height="43dp"
                 android:backgroundTint="@color/yellow"
@@ -158,5 +158,89 @@
                 app:layout_constraintVertical_bias="0.872" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/workoutSetsPopupEditWindow"
+            android:layout_width="310dp"
+            android:layout_height="280dp"
+            android:background="@drawable/rounded_window_yellow"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/editSetRepetitionsNum"
+                android:layout_width="259dp"
+                android:layout_height="55dp"
+                android:ems="10"
+                android:hint="Repetitions"
+                android:inputType="number"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.12" />
+
+            <EditText
+                android:id="@+id/editSetRestNum"
+                android:layout_width="259dp"
+                android:layout_height="55dp"
+                android:ems="10"
+                android:hint="Rest time"
+                android:inputType="number"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.364" />
+
+            <EditText
+                android:id="@+id/editSetWeight"
+                android:layout_width="259dp"
+                android:layout_height="55dp"
+                android:ems="10"
+                android:hint="Weight"
+                android:inputType="number"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.608" />
+
+            <Button
+                android:id="@+id/workoutSetPopupEditWindowCancelButton"
+                android:layout_width="95dp"
+                android:layout_height="43dp"
+                android:text="Cancel"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.832"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.872" />
+
+            <Button
+                android:id="@+id/workoutSetPopupEditWindowAcceptButton"
+                android:layout_width="95dp"
+                android:layout_height="43dp"
+                android:backgroundTint="@color/yellow"
+                android:text="Edit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.167"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.872" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

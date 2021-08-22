@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.workout_sets_list
 
 import android.database.sqlite.SQLiteDatabase
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -7,10 +7,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class WorkoutTasksListAdapterManager(var adapter: WorkoutTasksListAdapter,
-                                     dragDirs: Int,
-                                     swipeDirs: Int,
-                                     var db: SQLiteDatabase
+class WorkoutSetsListAdapterManager(var adapter: WorkoutSetsListAdapter,
+                                    dragDirs: Int,
+                                    swipeDirs: Int,
+                                    var db: SQLiteDatabase
 ): ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
     override fun onMove(
         recyclerView: RecyclerView,
@@ -28,9 +28,9 @@ class WorkoutTasksListAdapterManager(var adapter: WorkoutTasksListAdapter,
         adapter.onItemDismiss(viewHolder.adapterPosition)
     }
 
-    fun updateOrderNums(values: ArrayList<WorkoutTasksListItem>) {
+    fun updateOrderNums(values: ArrayList<WorkoutSetsListItem>) {
         for(i in 0 until values.size) {
-            db.execSQL("UPDATE workoutTasks SET workoutTaskOrderNum = ${i + 1} WHERE workoutTaskId = ${values[i].workoutTasksListItemId}")
+            db.execSQL("UPDATE workoutSets SET workoutSetOrderNum = ${i + 1} WHERE workoutSetId = ${values[i].workoutSetId}")
         }
     }
 }

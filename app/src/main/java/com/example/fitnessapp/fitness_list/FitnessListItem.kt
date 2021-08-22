@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.fitness_list
 
 private val TYPE_HEADER = 1
 private val TYPE_ITEM = 2

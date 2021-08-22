@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.fragments
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -13,6 +13,11 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.FitnessListAdapter
+import com.example.fitnessapp.fitness_list.FitnessListItem
+import com.example.fitnessapp.R
+import com.example.fitnessapp.sql.SQLListGetter
+import com.example.fitnessapp.workout_list.WorkoutListItem
 
 
 class Fitness : Fragment() {
@@ -30,13 +35,14 @@ class Fitness : Fragment() {
         val root = inflater.inflate(R.layout.fragment_fitness, container, false)
         db = root.context.openOrCreateDatabase("workout.db", Context.MODE_PRIVATE, null)
 
-        val listGetter = ListGetter(db)
+        val listGetter = SQLListGetter(db)
         val workoutsList = listGetter.getWorkoutsList()
         val workoutNames = getNamesAndNumbers(workoutsList)
 
         val workoutsSpinner: Spinner = root.findViewById(R.id.workoutsSpinner)
 
-        val spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(this.requireContext(), R.layout.workouts_spinner_item, workoutNames)
+        val spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(this.requireContext(),
+            R.layout.workouts_spinner_item, workoutNames)
         spinnerAdapter.setDropDownViewResource(R.layout.workouts_spinner_item)
         workoutsSpinner.adapter = spinnerAdapter
 
@@ -66,15 +72,21 @@ class Fitness : Fragment() {
                     val adapter = FitnessListAdapter(root, fitnessList, workoutsList[selectedItemNum].getId())
                     fitnessListRecyclerView.adapter = adapter
 
-                    val animationShow = AnimationUtils.loadAnimation(root.context, R.anim.popup_show)
+                    val animationShow = AnimationUtils.loadAnimation(root.context,
+                        R.anim.popup_show
+                    )
                     fitnessListRecyclerView.visibility = View.VISIBLE
                     fitnessListRecyclerView.startAnimation(animationShow)
                     isListShown = true
                 } else {
                     val fitnessListRecyclerView: RecyclerView = root.findViewById(R.id.fitnessRecyclerView)
 
-                    val animationShow = AnimationUtils.loadAnimation(root.context, R.anim.popup_show)
-                    val animationHide = AnimationUtils.loadAnimation(root.context, R.anim.popup_hide)
+                    val animationShow = AnimationUtils.loadAnimation(root.context,
+                        R.anim.popup_show
+                    )
+                    val animationHide = AnimationUtils.loadAnimation(root.context,
+                        R.anim.popup_hide
+                    )
 
                     fitnessListRecyclerView.startAnimation(animationHide)
 
@@ -108,7 +120,7 @@ class Fitness : Fragment() {
     }
 
     fun getFitnessList(db: SQLiteDatabase, workoutsList: ArrayList<WorkoutListItem>, selectedItemNum: Int): ArrayList<FitnessListItem> {
-        val listGetter = ListGetter(db)
+        val listGetter = SQLListGetter(db)
         val workoutTasks = listGetter.getWorkoutTasksList(workoutsList[selectedItemNum].getId())
         val fitnessList: ArrayList<FitnessListItem> = arrayListOf()
 

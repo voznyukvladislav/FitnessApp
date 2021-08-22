@@ -10,9 +10,11 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
 import android.database.sqlite.SQLiteDatabase
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.fitness_list.FitnessListItem
+import com.example.fitnessapp.sql.SQLInserter
+import com.example.fitnessapp.sql.SQLListGetter
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -109,13 +111,18 @@ class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>,
                 }
                 workoutCursor.close()
 
-                val doneWorkoutItem = insertDoneWorkout(db, doneWorkoutName)
+                val sqlInserter = SQLInserter(db)
+                sqlInserter.insertDoneWorkout(db, doneWorkoutName)
+                val doneWorkoutItem = sqlInserter.getInsertedDoneWorkout()
 
-                val listGetter = ListGetter(db)
+                val listGetter = SQLListGetter(db)
                 val workoutTasksList = listGetter.getWorkoutTasksList(workoutId)
                 val doneWorkoutTasksList: ArrayList<DoneWorkoutTasksListItem> = arrayListOf()
                 for(i in 0 until workoutTasksList.size) {
-                    doneWorkoutTasksList.add(insertDoneWorkoutTask(db, doneWorkoutItem.doneWorkoutId, workoutTasksList[i].workoutTasksListItemName))
+                    sqlInserter.insertDoneWorkoutTask(db,
+                        doneWorkoutItem.doneWorkoutId,
+                        workoutTasksList[i].workoutTasksListItemName)
+                    doneWorkoutTasksList.add(sqlInserter.getInsertedDoneWorkoutTask())
                 }
 
 
@@ -124,18 +131,16 @@ class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>,
                     val workoutSetsList = listGetter.getWorkoutSetsList(workoutTasksList[i].workoutTasksListItemId)
                     doneWorkoutSetsList.add(arrayListOf())
                     for(j in 0 until workoutSetsList.size) {
-                        val doneWorkoutSetItem = insertDoneWorkoutSet(db,
+                        sqlInserter.insertDoneWorkoutSet(db,
                             doneWorkoutTasksList[i].doneWorkoutTaskListItemId,
                             workoutSetsList[j].workoutSetRepetitions,
                             workoutSetsList[j].workoutSetRest,
                             workoutSetsList[j].workoutSetWeight)
-                        doneWorkoutSetsList[i].add(doneWorkoutSetItem)
+                        doneWorkoutSetsList[i].add(sqlInserter.getInsertedDoneWorkoutSet())
                     }
                 }
 
                 db.execSQL("INSERT INTO doneWorkoutsCalendar VALUES (NULL, ${doneWorkoutItem.doneWorkoutId}, ${currentDateId})")
-
-                //Toast.makeText(root.context, "day = ${day} month = ${month} year = ${year}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -175,54 +180,6 @@ class FitnessListAdapter(val root: View, var values: ArrayList<FitnessListItem>,
         }
         return false
     }
-
-    private fun insertDoneWorkout(db: SQLiteDatabase, doneWorkoutName: String): DoneWorkoutListItem {
-        db.execSQL("INSERT INTO doneWorkouts VALUES (NULL, '${doneWorkoutName}')")
-        val doneWorkoutsCursor = db.rawQuery("SELECT * FROM doneWorkouts WHERE doneWorkoutId = (SELECT MAX(doneWorkoutId) FROM doneWorkouts)", null)
-        var doneWorkoutItem = DoneWorkoutListItem()
-        while(doneWorkoutsCursor.moveToNext()) {
-            doneWorkoutItem = DoneWorkoutListItem(doneWorkoutsCursor.getInt(0), doneWorkoutsCursor.getString(1))
-        }
-        doneWorkoutsCursor.close()
-        return doneWorkoutItem
-    }
-
-    private fun insertDoneWorkoutTask(db: SQLiteDatabase, doneWorkoutId: Int, doneWorkoutTaskName: String): DoneWorkoutTasksListItem {
-        db.execSQL("INSERT INTO doneWorkoutTasks VALUES (NULL, ${doneWorkoutId}, '${doneWorkoutTaskName}')")
-
-        val doneWorkoutTasksCursor = db.rawQuery("SELECT doneWorkoutTaskId, doneWorkoutTaskName FROM doneWorkoutTasks WHERE doneWorkoutTaskId = " +
-                "(SELECT MAX(doneWorkoutTaskId) FROM doneWorkoutTasks)", null)
-        var doneWorkoutTask = DoneWorkoutTasksListItem()
-        while (doneWorkoutTasksCursor.moveToNext()) {
-            doneWorkoutTask = DoneWorkoutTasksListItem(doneWorkoutTasksCursor.getInt(0), doneWorkoutTasksCursor.getString(1))
-        }
-        doneWorkoutTasksCursor.close()
-
-        return doneWorkoutTask
-    }
-
-    private fun insertDoneWorkoutSet(db: SQLiteDatabase,
-                                    doneWorkoutTaskId: Int,
-                                    doneWorkoutSetRepetitions: Int,
-                                    doneWorkoutSetRest: Int,
-                                    doneWorkoutSetWeight: Int): DoneWorkoutSetsListItem {
-        db.execSQL("INSERT INTO doneWorkoutSets VALUES(NULL, ${doneWorkoutTaskId}, ${doneWorkoutSetRepetitions}, ${doneWorkoutSetRest}, ${doneWorkoutSetWeight})")
-
-        val doneWorkoutSetCursor = db.rawQuery("SELECT doneWorkoutSetId, doneWorkoutSetRepetitions, doneWorkoutSetRest, doneWorkoutSetWeight FROM doneWorkoutSets " +
-                "WHERE doneWorkoutSetId = (SELECT MAX(doneWorkoutSetId) FROM doneWorkoutSets)", null)
-        var doneWorkoutSetItem = DoneWorkoutSetsListItem()
-        while(doneWorkoutSetCursor.moveToNext()) {
-            doneWorkoutSetItem = DoneWorkoutSetsListItem(doneWorkoutSetCursor.getInt(0),
-                doneWorkoutSetCursor.getInt(1),
-                doneWorkoutSetCursor.getInt(2),
-                doneWorkoutSetCursor.getInt(3))
-        }
-        doneWorkoutSetCursor.close()
-
-        return doneWorkoutSetItem
-    }
-
-
 
     override fun getItemViewType(position: Int): Int {
         if(values[position].inListType == TYPE_HEADER) {
