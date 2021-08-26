@@ -14,6 +14,7 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import android.database.sqlite.SQLiteDatabase
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.*
@@ -43,14 +44,14 @@ class Calendar : Fragment() {
             widget.addDecorators(CurrentDayDecorator(activity, mydate))
         }
 
-
         val doneWorkoutsListRecyclerView: RecyclerView = root.findViewById(R.id.doneWorkoutsList)
         val dataSet = getDoneWorkoutsListRecyclerView(db, workoutDatesList)
 
         val manager = LinearLayoutManager(this.requireContext())
         doneWorkoutsListRecyclerView.layoutManager = manager
 
-        val adapter = DoneWorkoutsListAdapter(dataSet)
+        val navController = (activity as MainActivity?)!!.findNavController(R.id.screen)
+        val adapter = DoneWorkoutsListAdapter(dataSet, navController)
         doneWorkoutsListRecyclerView.adapter = adapter
 
         return root

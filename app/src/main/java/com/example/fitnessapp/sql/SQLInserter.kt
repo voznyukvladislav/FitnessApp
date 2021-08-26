@@ -2,7 +2,7 @@ package com.example.fitnessapp.sql
 
 import android.database.sqlite.SQLiteDatabase
 import com.example.fitnessapp.DoneWorkoutListItem
-import com.example.fitnessapp.DoneWorkoutSetsListItem
+import com.example.fitnessapp.done_workout_sets_list.DoneWorkoutSetsListItem
 import com.example.fitnessapp.DoneWorkoutTasksListItem
 import com.example.fitnessapp.workout_list.WorkoutListItem
 import com.example.fitnessapp.workout_sets_list.WorkoutSetsListItem

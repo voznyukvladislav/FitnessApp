@@ -94,9 +94,9 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
         var editWorkoutSetListItem: Button? = null
 
         init {
-            workoutSetRepetitions = itemView.findViewById(R.id.repetitionsNumber)
-            workoutSetRest = itemView.findViewById(R.id.restNumber)
-            workoutSetWeight = itemView.findViewById(R.id.weightNumber)
+            workoutSetRepetitions = itemView.findViewById(R.id.doneWorkoutSetRepetitionsNumber)
+            workoutSetRest = itemView.findViewById(R.id.doneWorkoutSetRestNumber)
+            workoutSetWeight = itemView.findViewById(R.id.doneWorkoutSetWeightNumber)
 
             editWorkoutSetListItem = itemView.findViewById(R.id.workoutSetsListItemEditButton)
         }

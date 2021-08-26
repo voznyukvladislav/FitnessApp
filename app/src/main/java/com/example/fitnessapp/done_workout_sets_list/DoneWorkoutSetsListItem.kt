@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.done_workout_sets_list
 
 class DoneWorkoutSetsListItem {
     var doneWorkoutSetsListItemId: Int = 0

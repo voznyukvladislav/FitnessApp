@@ -3,6 +3,8 @@ package com.example.fitnessapp.sql
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import com.example.fitnessapp.DoneWorkoutListItem
+import com.example.fitnessapp.done_workout_sets_list.DoneWorkoutSetsListItem
+import com.example.fitnessapp.done_workout_tasks_list.DoneWorkoutTasksListItem
 import com.example.fitnessapp.workout_list.WorkoutListItem
 import com.example.fitnessapp.workout_sets_list.WorkoutSetsListItem
 import com.example.fitnessapp.workout_tasks_list.WorkoutTasksListItem
@@ -129,5 +131,54 @@ class SQLListGetter {
         }
 
         return doneWorkoutsArrayList
+    }
+
+    fun getDoneWorkoutTasks(doneWorkoutId: Int): ArrayList<DoneWorkoutTasksListItem> {
+        val dataSet: ArrayList<DoneWorkoutTasksListItem> = arrayListOf()
+
+        val doneWorkoutTasksCursor = db!!.rawQuery("SELECT doneWorkoutTaskId, doneWorkoutTaskName FROM doneWorkoutTasks WHERE doneWorkoutId = ${doneWorkoutId}", null)
+        while(doneWorkoutTasksCursor.moveToNext()) {
+            val doneWorkoutTaskId: Int = doneWorkoutTasksCursor.getInt(0)
+            val doneWorkoutTaskName: String = doneWorkoutTasksCursor.getString(1)
+
+            val item = DoneWorkoutTasksListItem(doneWorkoutTaskId, doneWorkoutTaskName)
+            dataSet.add(item)
+        }
+        doneWorkoutTasksCursor.close()
+
+        for(i in dataSet) {
+            var doneWorkoutSetsCursor = db!!.rawQuery("SELECT SUM(doneWorkoutSetRepetitions) FROM doneWorkoutSets WHERE doneWorkoutTaskId = ${i.doneWorkoutTaskId}", null)
+            while(doneWorkoutSetsCursor.moveToNext()) {
+                i.doneWorkoutTaskTotalRepetitions = doneWorkoutSetsCursor.getInt(0)
+            }
+
+            doneWorkoutSetsCursor = db!!.rawQuery("SELECT COUNT(doneWorkoutSetId) FROM doneWorkoutSets WHERE doneWorkoutTaskId = ${i.doneWorkoutTaskId}", null)
+            while(doneWorkoutSetsCursor.moveToNext()) {
+                i.doneWorkoutTaskTotalSets = doneWorkoutSetsCursor.getInt(0)
+            }
+            doneWorkoutSetsCursor.close()
+        }
+
+        return dataSet
+    }
+
+    fun getDoneWorkoutSets(doneWorkoutTaskId: Int): ArrayList<DoneWorkoutSetsListItem> {
+        val dataSet: ArrayList<DoneWorkoutSetsListItem> = arrayListOf()
+
+        val doneWorkoutSetsCursor = db!!.rawQuery("SELECT * FROM doneWorkoutSets WHERE doneWorkoutTaskId = ${doneWorkoutTaskId}", null)
+        while(doneWorkoutSetsCursor.moveToNext()) {
+            val doneWorkoutSetId = doneWorkoutSetsCursor.getInt(0)
+            val doneWorkoutSetRepetitions = doneWorkoutSetsCursor.getInt(1)
+            val doneWorkoutSetRest = doneWorkoutSetsCursor.getInt(2)
+            val doneWorkoutSetWeight = doneWorkoutSetsCursor.getInt(3)
+
+            val newDataSetItem = DoneWorkoutSetsListItem(doneWorkoutSetId,
+                doneWorkoutSetRepetitions,
+                doneWorkoutSetRest,
+                doneWorkoutSetWeight)
+            dataSet.add(newDataSetItem)
+        }
+        doneWorkoutSetsCursor.close()
+        return dataSet
     }
 }

@@ -91,9 +91,9 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
         var editWorkoutTasksListItem: Button? = null
 
         init {
-            workoutTasksListItemName = itemView.findViewById(R.id.doneWorkoutName)
-            workoutTasksListItemTotalSets = itemView.findViewById(R.id.workoutTotalSets)
-            workoutTasksListItemTotalRepetitions = itemView.findViewById(R.id.workoutTotalRepetitions)
+            workoutTasksListItemName = itemView.findViewById(R.id.doneWorkoutTaskName)
+            workoutTasksListItemTotalSets = itemView.findViewById(R.id.doneWorkoutTaskTotalSets)
+            workoutTasksListItemTotalRepetitions = itemView.findViewById(R.id.doneWorkoutTaskTotalRepetitions)
 
             editWorkoutTasksListItem = itemView.findViewById(R.id.editWorkoutTaskListItem)
         }

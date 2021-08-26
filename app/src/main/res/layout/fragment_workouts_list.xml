@@ -51,7 +51,7 @@
                 android:layout_width="259dp"
                 android:layout_height="55dp"
                 android:ems="10"
-                android:hint="Workout task name"
+                android:hint="Workout name"
                 android:inputType="textPersonName"
                 android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"

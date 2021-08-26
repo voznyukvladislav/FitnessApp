@@ -25,12 +25,12 @@
         android:id="@+id/calendar"
         android:name="com.example.fitnessapp.fragments.Calendar"
         android:label="fragment_calendar"
-        tools:layout="@layout/fragment_calendar" />
-    <fragment
-        android:id="@+id/settings"
-        android:name="com.example.fitnessapp.fragments.Settings"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_calendar">
+        <action
+            android:id="@+id/action_calendar_to_done_workout_tasks_list"
+            app:destination="@id/done_workout_tasks_list"
+            app:enterAnim="@android:anim/fade_in" />
+    </fragment>
     <fragment
         android:id="@+id/workoutTasksList"
         android:name="com.example.fitnessapp.fragments.WorkoutTasksList"
@@ -67,4 +67,18 @@
             app:popUpTo="@id/workoutTasksList"
             />
     </fragment>
+    <fragment
+        android:id="@+id/done_workout_tasks_list"
+        android:name="com.example.fitnessapp.fragments.DoneWorkoutTasksList"
+        android:label="fragment_done_workout_tasks_list">
+        <action
+            android:id="@+id/action_done_workout_tasks_list_to_done_workout_sets_list"
+            app:destination="@id/done_workout_sets_list"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/done_workout_sets_list"
+        android:name="com.example.fitnessapp.fragments.DoneWorkoutSetsList"
+        android:label="fragment_done_workout_sets_list" />
 </navigation>

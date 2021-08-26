@@ -85,7 +85,7 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
         var workoutTotalTasks: TextView? = null
         var workoutEditButton: Button? = null
         init {
-            workoutName = itemView.findViewById(R.id.doneWorkoutName)
+            workoutName = itemView.findViewById(R.id.doneWorkoutTaskName)
             workoutTotalTasks = itemView.findViewById(R.id.workoutTotalTasks)
             workoutEditButton = itemView.findViewById(R.id.editWorkout)
         }

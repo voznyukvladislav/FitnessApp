@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.database.sqlite.SQLiteDatabase
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.done_workout_sets_list.DoneWorkoutSetsListItem
 import com.example.fitnessapp.fitness_list.FitnessListItem
 import com.example.fitnessapp.sql.SQLInserter
 import com.example.fitnessapp.sql.SQLListGetter
