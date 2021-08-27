@@ -9,7 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:splitMotionEvents="false">
 
         <Spinner
             android:id="@+id/workoutsSpinner"
@@ -43,6 +44,7 @@
             app:layout_constraintVertical_bias="0.028" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:splitMotionEvents="false"
             android:id="@+id/fitnessRecyclerView"
             tools:listitem="@layout/fitness_list_header_item"
             android:layout_width="match_parent"

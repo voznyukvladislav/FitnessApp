@@ -20,7 +20,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/navigationBarInWorkoutTasks"
 
-
+            android:splitMotionEvents="false"
             app:layout_constraintVertical_bias="0.554"
             tools:listitem="@layout/workout_task_list_item">
 

@@ -20,7 +20,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/workoutSetsListNavigationBar"
             app:layout_constraintVertical_bias="0.554"
-            tools:listitem="@layout/workout_set_list_item">
+            tools:listitem="@layout/workout_set_list_item"
+            android:splitMotionEvents="false">
 
         </androidx.recyclerview.widget.RecyclerView>
 
