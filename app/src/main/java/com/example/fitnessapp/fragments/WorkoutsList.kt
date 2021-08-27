@@ -81,6 +81,7 @@ class WorkoutsList : Fragment() {
         workoutListPopupAddWindow.acceptButton.setOnClickListener {
             if(!workoutListPopupAddWindow.workoutNameEditText.text.toString().isNullOrBlank()) {
                 workoutListPopupAddWindow.add(db)
+                workoutListPopupAddWindow.clearInputFields()
                 workoutListPopupAddWindow.hide()
 
                 val workoutListItem = SQLInserter(db).getInsertedWorkout()
