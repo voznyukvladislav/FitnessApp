@@ -20,12 +20,12 @@ class SQLInserter {
     // Insertion into db
     // Inserts new workout
     fun insertWorkout(workoutName: String) {
-        db!!.execSQL("INSERT INTO workouts VALUES(NULL, '${workoutName}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts), 0)")
+        db!!.execSQL("INSERT INTO workouts VALUES(NULL, '${workoutName}', (SELECT MAX(workoutOrderNum) + 1 FROM Workouts))")
     }
 
     // Inserts new workout task
     fun insertWorkoutTask(workoutId: Int, workoutTaskName: String) {
-        db!!.execSQL("INSERT INTO workoutTasks VALUES (NULL, ${workoutId}, '${workoutTaskName}', 0, 0)")
+        db!!.execSQL("INSERT INTO workoutTasks VALUES (NULL, ${workoutId}, '${workoutTaskName}', 0)")
     }
 
     // Inserts new workout set
@@ -37,9 +37,8 @@ class SQLInserter {
                 "${workoutTaskId}, " +
                 "${workoutSetRepetitions}, " +
                 "${workoutSetRest}, " +
-                "0," +
-                "${workoutSetWeight}," +
-                "0)")
+                "0, " +
+                "${workoutSetWeight})")
     }
 
     // Inserts done workout to doneWorkouts table
