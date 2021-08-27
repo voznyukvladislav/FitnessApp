@@ -29,7 +29,8 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
     }
 
     override fun onBindViewHolder(holder: WorkoutListViewHolder, position: Int) {
-        val item: WorkoutListItem = values.get(position)
+        val item: WorkoutListItem = values[position]
+
         holder.workoutName!!.setText("Workout name: ${item.getName()}")
         holder.workoutTotalTasks!!.setText("Total tasks: ${item.getTotalTasks()}")
 
@@ -41,32 +42,43 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
 
         holder.workoutEditButton!!.setOnClickListener {
             val workoutPopupEditWindow = WorkoutListPopupEditWindow(root)
-            workoutPopupEditWindow.setInputFieldValue(values[position].getName())
+            workoutPopupEditWindow.setInputFieldValue(item.getName())
             workoutPopupEditWindow.show()
+
+
 
             workoutPopupEditWindow.acceptButton.setOnClickListener {
                 val newName = workoutPopupEditWindow.workoutNameEditText.text.toString()
                 if(!newName.isNullOrBlank()) {
-                    workoutPopupEditWindow.updateWorkoutListItem(db, values[position].getId())
+                    workoutPopupEditWindow.updateWorkoutListItem(db, item.getId())
                     workoutPopupEditWindow.hide()
                     KeyboardHider(root).hideKeyboard()
 
-                    values[position].setName(newName)
-                    this.notifyItemChanged(position)
+                    item.setName(newName)
+
+                    // Finding current element position (in case if it was moved)
+                    var curPos = 0
+                    for(i in 0 until values.size) {
+                        if(values[i].getId() == item.getId()) {
+                            curPos = i
+                            break
+                        }
+                    }
+
+                    this.notifyItemChanged(curPos)
                 }
             }
         }
     }
 
-
     fun swapItems(fromPosition: Int, toPosition: Int): ArrayList<WorkoutListItem> {
         if(fromPosition < toPosition) {
-            for (i in fromPosition..toPosition - 1) {
-                values.set(i, values.set(i + 1, values.get(i)));
+            for (i in fromPosition until toPosition) {
+                values[i] = values.set(i + 1, values[i])
             }
         } else {
             for (i in fromPosition..toPosition + 1) {
-                values.set(i, values.set(i - 1, values.get(i)));
+                values[i] = values.set(i - 1, values[i])
             }
         }
 
@@ -75,7 +87,7 @@ class WorkoutListAdapter(var values: ArrayList<WorkoutListItem>,
     }
 
     fun onItemDismiss(position: Int) {
-        db.execSQL("DELETE FROM workouts WHERE workoutId = ${values.get(position).getId()}")
+        db.execSQL("DELETE FROM workouts WHERE workoutId = ${values[position].getId()}")
         values.removeAt(position)
         notifyItemRemoved(position)
     }

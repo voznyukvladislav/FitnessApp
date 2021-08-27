@@ -130,7 +130,7 @@
                 android:layout_width="95dp"
                 android:layout_height="43dp"
                 android:backgroundTint="@color/red"
-                android:text="Add"
+                android:text="Edit"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.167"

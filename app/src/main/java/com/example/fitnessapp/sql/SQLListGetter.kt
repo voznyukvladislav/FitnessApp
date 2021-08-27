@@ -88,7 +88,7 @@ class SQLListGetter {
     fun getWorkoutSetsList(workoutTaskId: Int): ArrayList<WorkoutSetsListItem> {
         val dataSet: ArrayList<WorkoutSetsListItem> = arrayListOf()
 
-        val cursor = this.db!!.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetOrderNum, workoutSetWeight " +
+        val cursor = this.db!!.rawQuery("SELECT workoutSetId, workoutSetRepetitions, workoutSetRest, workoutSetWeight " +
                 "FROM workoutSets WHERE workoutTaskId = ${workoutTaskId} ORDER BY workoutSetOrderNum", null)
 
         var workoutSetId: Int = 0
@@ -165,7 +165,7 @@ class SQLListGetter {
     fun getDoneWorkoutSets(doneWorkoutTaskId: Int): ArrayList<DoneWorkoutSetsListItem> {
         val dataSet: ArrayList<DoneWorkoutSetsListItem> = arrayListOf()
 
-        val doneWorkoutSetsCursor = db!!.rawQuery("SELECT * FROM doneWorkoutSets WHERE doneWorkoutTaskId = ${doneWorkoutTaskId}", null)
+        val doneWorkoutSetsCursor = db!!.rawQuery("SELECT doneWorkoutSetId, doneWorkoutSetRepetitions, doneWorkoutSetRest, doneWorkoutSetWeight FROM doneWorkoutSets WHERE doneWorkoutTaskId = ${doneWorkoutTaskId}", null)
         while(doneWorkoutSetsCursor.moveToNext()) {
             val doneWorkoutSetId = doneWorkoutSetsCursor.getInt(0)
             val doneWorkoutSetRepetitions = doneWorkoutSetsCursor.getInt(1)

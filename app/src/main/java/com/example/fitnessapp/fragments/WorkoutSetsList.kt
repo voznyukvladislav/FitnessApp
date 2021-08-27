@@ -120,16 +120,10 @@ class WorkoutSetsList : Fragment() {
             workoutSetsListPopupAddWindow.show()
         }
 
-
         workoutSetsListPopupAddWindow.acceptButton.setOnClickListener {
             val newSetRepetitionsNum = workoutSetsListPopupAddWindow.setRepetitionsEditText.text.toString()
             val newSetRestNum = workoutSetsListPopupAddWindow.setRestNumEditText.text.toString()
-            var newSetWeightNum = workoutSetsListPopupAddWindow.setWeightEditText.text.toString()
             if(!newSetRepetitionsNum.isNullOrBlank() and !newSetRestNum.isNullOrBlank()) {
-
-                if(!newSetWeightNum.isNullOrBlank()) {
-                    newSetWeightNum = workoutSetsListPopupAddWindow.setWeightEditText.text.toString()
-                }
 
                 workoutSetsListPopupAddWindow.addWorkoutSet(db, workoutTaskId)
                 workoutSetsListPopupAddWindow.hide()

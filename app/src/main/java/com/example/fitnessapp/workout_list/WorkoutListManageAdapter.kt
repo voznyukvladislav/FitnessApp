@@ -12,7 +12,7 @@ class WorkoutListManageAdapter(adapter: WorkoutListAdapter, context: Context, dr
 
     var workoutTasksAdapter = adapter
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        var values = workoutTasksAdapter.swapItems(viewHolder.adapterPosition, target.adapterPosition)
+        val values = workoutTasksAdapter.swapItems(viewHolder.adapterPosition, target.adapterPosition)
         CoroutineScope(Dispatchers.IO).launch {
             UpdateOrderNums(values)
         }

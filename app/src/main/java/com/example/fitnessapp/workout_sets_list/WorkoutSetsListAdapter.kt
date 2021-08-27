@@ -46,14 +46,23 @@ class WorkoutSetsListAdapter(var db: SQLiteDatabase,
                     workoutSetsListPopupEditWindow.hide()
                     KeyboardHider(root).hideKeyboard()
 
-                    values[position].workoutSetRepetitions = workoutSetsListPopupEditWindow.setRepetitionsEditText.text.toString().toInt()
-                    values[position].workoutSetRest = workoutSetsListPopupEditWindow.setRestNumEditText.text.toString().toInt()
-                    values[position].workoutSetWeight = 0
+                    item.workoutSetRepetitions = workoutSetsListPopupEditWindow.setRepetitionsEditText.text.toString().toInt()
+                    item.workoutSetRest = workoutSetsListPopupEditWindow.setRestNumEditText.text.toString().toInt()
+                    item.workoutSetWeight = 0
                     if(!workoutSetsListPopupEditWindow.setWeightEditText.text.toString().isNullOrBlank()) {
-                        values[position].workoutSetWeight = workoutSetsListPopupEditWindow.setWeightEditText.text.toString().toInt()
+                        item.workoutSetWeight = workoutSetsListPopupEditWindow.setWeightEditText.text.toString().toInt()
                     }
 
-                    this.notifyItemChanged(position)
+                    // Finding current element position (in case if it was moved)
+                    var curPos = 0
+                    for(i in 0 until values.size) {
+                        if(values[i].workoutSetId == item.workoutSetId) {
+                            curPos = i
+                            break
+                        }
+                    }
+
+                    this.notifyItemChanged(curPos)
                 }
             }
 

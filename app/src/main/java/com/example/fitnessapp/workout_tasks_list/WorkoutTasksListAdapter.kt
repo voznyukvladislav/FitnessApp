@@ -27,7 +27,7 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
     }
 
     override fun onBindViewHolder(holder: WorkoutTasksListViewHolder, position: Int) {
-        var item = values[position]
+        val item = values[position]
         holder.workoutTasksListItemName?.setText("Task name: ${item.workoutTasksListItemName}")
         holder.workoutTasksListItemTotalSets?.setText("Total sets: ${item.workoutTasksListItemTotalSets}")
         holder.workoutTasksListItemTotalRepetitions?.setText("Total repetitions: ${item.workoutTasksListItemTotalRepetitions}")
@@ -41,17 +41,27 @@ class WorkoutTasksListAdapter(var values: ArrayList<WorkoutTasksListItem>,
 
         holder.editWorkoutTasksListItem!!.setOnClickListener {
             val workoutTasksListPopupEditWindow = WorkoutTasksListPopupEditWindow(root)
-            workoutTasksListPopupEditWindow.setInputFieldValue(values[position].workoutTasksListItemName)
+            workoutTasksListPopupEditWindow.setInputFieldValue(item.workoutTasksListItemName)
             workoutTasksListPopupEditWindow.show()
 
             workoutTasksListPopupEditWindow.acceptButton.setOnClickListener {
                 if(!workoutTasksListPopupEditWindow.editWorkoutTaskNameEditText.text.toString().isNullOrBlank()) {
-                    workoutTasksListPopupEditWindow.updateWorkoutTask(db, values[position].workoutTasksListItemId)
+                    workoutTasksListPopupEditWindow.updateWorkoutTask(db, item.workoutTasksListItemId)
                     workoutTasksListPopupEditWindow.hide()
                     KeyboardHider(root).hideKeyboard()
 
-                    values[position].workoutTasksListItemName = workoutTasksListPopupEditWindow.editWorkoutTaskNameEditText.text.toString()
-                    this.notifyItemChanged(position)
+                    item.workoutTasksListItemName = workoutTasksListPopupEditWindow.editWorkoutTaskNameEditText.text.toString()
+
+                    // Finding current element position (in case if it was moved)
+                    var curPos = 0
+                    for(i in 0 until values.size) {
+                        if(values[i].workoutTasksListItemId == item.workoutTasksListItemId) {
+                            curPos = i
+                            break
+                        }
+                    }
+
+                    this.notifyItemChanged(curPos)
                 }
             }
 
